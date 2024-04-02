@@ -1,0 +1,6 @@
+lightning==2.2.1
+matplotlib==3.7.5
+opencv-python==4.9.0.80
+progressbar2==4.4.2
+tifffile==2023.7.10
+torch==2.2.2

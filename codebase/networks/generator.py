@@ -2,9 +2,10 @@ import torch
 from torch import nn
 
 
-class get_gernerator(nn.Module):
+class Generator(nn.Module):
+
     def __init__(self):
-        super(get_gernerator, self).__init__()
+        super(Generator, self).__init__()
         w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
         b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)
         self.w = torch.nn.Parameter(w)

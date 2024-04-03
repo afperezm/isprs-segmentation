@@ -15,12 +15,3 @@ This is the implementation of the core method of ColorMapGAN, containing a total
 + deeplabv2.py: This is the segmentation model. The original paper used Unet, here I use deeplabv2
 + generator.py: This is the implementation of the generator in ColorMapGAN and the core innovation of the paper.
 + discriminator.py: This is the implementation of the discriminator in ColorMapGAN.
-
-
-## Preparing the dataset
-
-https://www.isprs.org/education/benchmarks/UrbanSemLab/default.aspx
-
-```
-python utils/dataset_split.py --data_dir --output_dir  --use_rgb --patch_size 256 --stride 32 --scale 1.8
-```

@@ -12,13 +12,21 @@ IMAGES_IR_DIR = '3_Ortho_IRRG'
 LABELS_DIR = '5_Labels_all'
 
 
+def rescale_image(image, scale):
+    height, width = image.shape[0], image.shape[1]
+
+    image_rescaled = cv2.resize(image, (int(width * scale), int(height * scale)), interpolation=cv2.INTER_CUBIC)
+
+    return image_rescaled
+
+
 def pad_image(image, patch_size):
 
     original_height, original_width = image.shape[0], image.shape[1]
     residual_height, residual_width = original_height % patch_size, original_width % patch_size
 
-    width_pad = 0 if residual_width == 0 else patch_size - residual_width
     height_pad = 0 if residual_height == 0 else patch_size - residual_height
+    width_pad = 0 if residual_width == 0 else patch_size - residual_width
 
     image_padded = np.pad(image, ((0, height_pad), (0, width_pad), (0, 0)), mode='constant')
 
@@ -27,15 +35,18 @@ def pad_image(image, patch_size):
     return img_pad
 
 
-def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_size, stride):
+def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_size, stride, scale):
     image_filename = os.path.splitext(os.path.basename(image_path))[0]
     label_filename = os.path.splitext(os.path.basename(label_path))[0]
 
     image = tiff.imread(image_path)
     label = tiff.imread(label_path)
 
-    image_padded = pad_image(image, patch_size)
-    label_padded = pad_image(label, patch_size)
+    image_rescaled = rescale_image(image, scale)
+    label_rescaled = rescale_image(label, scale)
+
+    image_padded = pad_image(image_rescaled, patch_size)
+    label_padded = pad_image(label_rescaled, patch_size)
 
     assert image_padded.shape == label_padded.shape
 
@@ -60,6 +71,7 @@ def main():
     use_ir = PARAMS.use_ir
     patch_size = PARAMS.patch_size
     stride = PARAMS.stride
+    scale = PARAMS.scale
 
     if use_ir:
         images_dir = os.path.join(data_dir, IMAGES_IR_DIR)
@@ -92,7 +104,7 @@ def main():
 
     bar = progressbar.ProgressBar(max_value=num_images)
     for idx, (img_path, msk_path) in enumerate(zip(images_paths, labels_paths)):
-        spit_image_and_label(output_images_dir, output_labels_dir, img_path, msk_path, patch_size, stride)
+        spit_image_and_label(output_images_dir, output_labels_dir, img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
     bar.update(num_images)
 
@@ -104,6 +116,7 @@ def parse_args():
     parser.add_argument("--use_ir", action="store_true")
     parser.add_argument("--patch_size", type=int, default=512)
     parser.add_argument("--stride", type=int, default=256)
+    parser.add_argument("--scale", type=float, default=1.0)
     return parser.parse_args()
 
 

@@ -30,7 +30,7 @@ def pad_image(image, patch_size):
     return image_padded
 
 
-def spit_image_and_label(output_dir, image_path, label_path, patch_size, stride, scale):
+def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride, scale):
 
     images_dir = os.path.join(output_dir, f'images_{patch_size}_{stride}')
     labels_dir = os.path.join(output_dir, f'labels_{patch_size}_{stride}')
@@ -95,13 +95,13 @@ def main():
 
     bar = progressbar.ProgressBar(max_value=len(train_images_paths))
     for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):
-        spit_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, scale)
+        crop_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
     bar.update(num_images)
 
     bar = progressbar.ProgressBar(max_value=len(test_images_paths))
     for idx, (img_path, msk_path) in enumerate(zip(test_images_paths, test_labels_paths)):
-        spit_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, stride, scale)
+        crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
     bar.update(num_images)
 

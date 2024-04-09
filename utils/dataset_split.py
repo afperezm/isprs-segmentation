@@ -90,8 +90,8 @@ def main():
 
     assert num_images == num_labels
 
-    train_images_paths, test_images_paths = train_test_split(labels_paths, random_state=seed)
-    train_labels_paths, test_labels_paths = train_test_split(images_paths, random_state=seed)
+    train_images_paths, test_images_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
+    train_labels_paths, test_labels_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
 
     bar = progressbar.ProgressBar(max_value=len(train_images_paths))
     for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):

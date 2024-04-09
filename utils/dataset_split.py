@@ -7,11 +7,6 @@ import progressbar
 import tifffile as tiff
 
 
-IMAGES_RGB_DIR = '2_Ortho_RGB'
-IMAGES_IRRG_DIR = '3_Ortho_IRRG'
-LABELS_DIR = '5_Labels_all'
-
-
 def rescale_image(image, scale):
     height, width = image.shape[0], image.shape[1]
 
@@ -67,26 +62,14 @@ def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_s
 
 
 def main():
-    data_dir = PARAMS.data_dir
+    images_dir = PARAMS.images_dir
+    labels_dir = PARAMS.labels_dir
     output_dir = PARAMS.output_dir
-    use_rgb = PARAMS.use_rgb
     patch_size = PARAMS.patch_size
     stride = PARAMS.stride
     scale = PARAMS.scale
 
-    if use_rgb:
-        images_dir = os.path.join(data_dir, IMAGES_RGB_DIR)
-    else:
-        images_dir = os.path.join(data_dir, IMAGES_IRRG_DIR)
-
-    labels_dir = os.path.join(data_dir, LABELS_DIR)
-
-    if use_rgb:
-        mode = "rgb"
-    else:
-        mode = "irrg"
-
-    output_images_dir = os.path.join(output_dir, f'images_{mode}_{patch_size}_{stride}')
+    output_images_dir = os.path.join(output_dir, f'images_{patch_size}_{stride}')
     output_labels_dir = os.path.join(output_dir, f'labels_{patch_size}_{stride}')
 
     if not os.path.exists(output_images_dir):
@@ -112,9 +95,9 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser("Spitter of ISPRS datasets into small patches")
-    parser.add_argument("--data_dir", required=True)
+    parser.add_argument("--images_dir", required=True)
+    parser.add_argument("--labels_dir", required=True)
     parser.add_argument("--output_dir", required=True)
-    parser.add_argument("--use_rgb", action="store_true")
     parser.add_argument("--patch_size", type=int, default=512)
     parser.add_argument("--stride", type=int, default=256)
     parser.add_argument("--scale", type=float, default=1.0)

@@ -30,9 +30,7 @@ def pad_image(image, patch_size):
 
     image_padded = np.pad(image, ((0, height_pad), (0, width_pad), (0, 0)), mode='constant')
 
-    img_pad = image_padded['image']
-
-    return img_pad
+    return image_padded
 
 
 def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_size, stride, scale):
@@ -57,6 +55,9 @@ def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_s
     for patch_index, (x, y) in enumerate(patches_coords):
         image_patch = image_padded[y:y + patch_size, x:x + patch_size]
         label_patch = label_padded[y:y + patch_size, x:x + patch_size]
+
+        image_patch = cv2.cvtColor(np.array(image_patch), cv2.COLOR_BGR2RGB)
+        label_patch = cv2.cvtColor(np.array(label_patch), cv2.COLOR_BGR2RGB)
 
         out_image_path = os.path.join(images_dir, "{}_{}.png".format(image_filename, patch_index))
         cv2.imwrite(out_image_path, image_patch)

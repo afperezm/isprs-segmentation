@@ -5,11 +5,14 @@ from torch import nn
 class Generator(nn.Module):
 
     def __init__(self):
-        super(Generator, self).__init__()
+        super().__init__()
+
         w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
         b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)
-        self.w = torch.nn.Parameter(w)
-        self.b = torch.nn.Parameter(b)
+
+        self.w = nn.Parameter(w)
+        self.b = nn.Parameter(b)
+
         self.register_parameter("weight_trans", self.w)
         self.register_parameter("bias_trans", self.b)
 

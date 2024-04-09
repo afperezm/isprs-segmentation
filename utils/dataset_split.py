@@ -6,6 +6,8 @@ import numpy as np
 import progressbar
 import tifffile as tiff
 
+from sklearn.model_selection import train_test_split
+
 
 def rescale_image(image, scale):
     height, width = image.shape[0], image.shape[1]
@@ -28,7 +30,17 @@ def pad_image(image, patch_size):
     return image_padded
 
 
-def spit_image_and_label(images_dir, labels_dir, image_path, label_path, patch_size, stride, scale):
+def spit_image_and_label(output_dir, image_path, label_path, patch_size, stride, scale):
+
+    images_dir = os.path.join(output_dir, f'images_{patch_size}_{stride}')
+    labels_dir = os.path.join(output_dir, f'labels_{patch_size}_{stride}')
+
+    if not os.path.exists(images_dir):
+        os.makedirs(images_dir)
+
+    if not os.path.exists(labels_dir):
+        os.makedirs(labels_dir)
+
     image_filename = os.path.splitext(os.path.basename(image_path))[0]
     label_filename = os.path.splitext(os.path.basename(label_path))[0]
 
@@ -68,15 +80,7 @@ def main():
     patch_size = PARAMS.patch_size
     stride = PARAMS.stride
     scale = PARAMS.scale
-
-    output_images_dir = os.path.join(output_dir, f'images_{patch_size}_{stride}')
-    output_labels_dir = os.path.join(output_dir, f'labels_{patch_size}_{stride}')
-
-    if not os.path.exists(output_images_dir):
-        os.makedirs(output_images_dir)
-
-    if not os.path.exists(output_labels_dir):
-        os.makedirs(output_labels_dir)
+    seed = PARAMS.seed
 
     images_paths = sorted(glob.glob(os.path.join(images_dir, "*.tif")))
     labels_paths = sorted(glob.glob(os.path.join(labels_dir, "*.tif")))
@@ -86,9 +90,18 @@ def main():
 
     assert num_images == num_labels
 
-    bar = progressbar.ProgressBar(max_value=num_images)
-    for idx, (img_path, msk_path) in enumerate(zip(images_paths, labels_paths)):
-        spit_image_and_label(output_images_dir, output_labels_dir, img_path, msk_path, patch_size, stride, scale)
+    train_images_paths, test_images_paths = train_test_split(labels_paths, random_state=seed)
+    train_labels_paths, test_labels_paths = train_test_split(images_paths, random_state=seed)
+
+    bar = progressbar.ProgressBar(max_value=len(train_images_paths))
+    for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):
+        spit_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, scale)
+        bar.update(idx)
+    bar.update(num_images)
+
+    bar = progressbar.ProgressBar(max_value=len(test_images_paths))
+    for idx, (img_path, msk_path) in enumerate(zip(test_images_paths, test_labels_paths)):
+        spit_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
     bar.update(num_images)
 
@@ -101,6 +114,7 @@ def parse_args():
     parser.add_argument("--patch_size", type=int, default=512)
     parser.add_argument("--stride", type=int, default=256)
     parser.add_argument("--scale", type=float, default=1.0)
+    parser.add_argument("--seed", type=int, default=42)
     return parser.parse_args()
 
 

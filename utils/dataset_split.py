@@ -93,17 +93,21 @@ def main():
     train_images_paths, test_images_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
     train_labels_paths, test_labels_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
 
-    bar = progressbar.ProgressBar(max_value=len(train_images_paths))
+    num_train_images = len(test_images_paths)
+
+    bar = progressbar.ProgressBar(max_value=num_train_images)
     for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):
         crop_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
-    bar.update(num_images)
+    bar.update(num_train_images)
 
-    bar = progressbar.ProgressBar(max_value=len(test_images_paths))
+    num_test_images = len(test_images_paths)
+
+    bar = progressbar.ProgressBar(max_value=num_test_images)
     for idx, (img_path, msk_path) in enumerate(zip(test_images_paths, test_labels_paths)):
         crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, stride, scale)
         bar.update(idx)
-    bar.update(num_images)
+    bar.update(num_test_images)
 
 
 def parse_args():

@@ -66,10 +66,10 @@ def spit_image_and_label(output_dir, image_path, label_path, patch_size, stride,
         image_patch = cv2.cvtColor(np.array(image_patch), cv2.COLOR_BGR2RGB)
         label_patch = cv2.cvtColor(np.array(label_patch), cv2.COLOR_BGR2RGB)
 
-        out_image_path = os.path.join(images_dir, "{}_{}.png".format(image_filename, patch_index))
+        out_image_path = os.path.join(images_dir, "{}_{:04}.png".format(image_filename, patch_index))
         cv2.imwrite(out_image_path, image_patch)
 
-        out_label_path = os.path.join(labels_dir, "{}_{}.png".format(label_filename, patch_index))
+        out_label_path = os.path.join(labels_dir, "{}_{:04}.png".format(label_filename, patch_index))
         cv2.imwrite(out_label_path, label_patch)
 
 

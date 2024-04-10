@@ -100,7 +100,7 @@ def main():
     train_images_paths, test_images_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
     train_labels_paths, test_labels_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
 
-    num_train_images = len(test_images_paths)
+    num_train_images = len(train_images_paths)
 
     bar = progressbar.ProgressBar(max_value=num_train_images)
     for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):

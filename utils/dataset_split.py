@@ -83,6 +83,9 @@ def main():
     scale = PARAMS.scale
     seed = PARAMS.seed
 
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     with open(os.path.join(output_dir, "params.json"), "w") as params_json:
         json.dump(PARAMS, params_json, indent=6)
 

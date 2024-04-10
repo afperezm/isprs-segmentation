@@ -87,7 +87,7 @@ def main():
         os.makedirs(output_dir)
 
     with open(os.path.join(output_dir, "params.json"), "w") as params_json:
-        json.dump(PARAMS, params_json, indent=6)
+        json.dump(vars(PARAMS), params_json, indent=4)
 
     images_paths = sorted(glob.glob(os.path.join(images_dir, "*.tif")))
     labels_paths = sorted(glob.glob(os.path.join(labels_dir, "*.tif")))

@@ -1,6 +1,7 @@
 import argparse
 import cv2
 import glob
+import json
 import os
 import numpy as np
 import progressbar
@@ -81,6 +82,9 @@ def main():
     stride = PARAMS.stride
     scale = PARAMS.scale
     seed = PARAMS.seed
+
+    with open(os.path.join(output_dir, "params.json"), "w") as params_json:
+        json.dump(PARAMS, params_json, indent=6)
 
     images_paths = sorted(glob.glob(os.path.join(images_dir, "*.tif")))
     labels_paths = sorted(glob.glob(os.path.join(labels_dir, "*.tif")))

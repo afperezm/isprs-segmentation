@@ -60,7 +60,7 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
 
     patches_coords = [(x, y) for y in range(0, image_height, stride) for x in range(0, image_width, stride)]
 
-    for patch_index, (x, y) in enumerate(patches_coords):
+    for patch_index, (x, y) in enumerate(patches_coords, 1):
         image_patch = image_padded[y:y + patch_size, x:x + patch_size]
         label_patch = label_padded[y:y + patch_size, x:x + patch_size]
 

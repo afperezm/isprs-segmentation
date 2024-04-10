@@ -33,8 +33,8 @@ def pad_image(image, patch_size):
 
 def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride, scale):
 
-    images_dir = os.path.join(output_dir, f'images_{patch_size}_{stride}')
-    labels_dir = os.path.join(output_dir, f'labels_{patch_size}_{stride}')
+    images_dir = os.path.join(output_dir, f'images')
+    labels_dir = os.path.join(output_dir, f'labels')
 
     if not os.path.exists(images_dir):
         os.makedirs(images_dir)
@@ -97,8 +97,8 @@ def main():
 
     assert num_images == num_labels
 
-    train_images_paths, test_images_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
-    train_labels_paths, test_labels_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
+    train_images_paths, test_images_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
+    train_labels_paths, test_labels_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
 
     num_train_images = len(train_images_paths)
 

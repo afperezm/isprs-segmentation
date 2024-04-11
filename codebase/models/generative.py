@@ -33,7 +33,7 @@ class ColorMapGAN(LightningModule):
         # Generate images
         fake_source_images = self.generator(target_images)
 
-        valid = torch.ones(source_images.size(0), 1).type_as(source_images)
+        valid = torch.ones(source_images.shape).type_as(source_images)
         g_loss = self.adversarial_loss(self.discriminator(fake_source_images), valid)
 
         self.log("train/g_loss", g_loss, prog_bar=True)
@@ -49,10 +49,10 @@ class ColorMapGAN(LightningModule):
         fake_source_images = self.generator(target_images)
 
         # how well can it label as real?
-        valid = torch.ones(source_images.size(0), 1).type_as(source_images)
+        valid = torch.ones(source_images.shape).type_as(source_images)
         real_loss = self.adversarial_loss(self.discriminator(source_images), valid)
         # how well can it label as fake?
-        fake = torch.zeros(source_images.size(0), 1).type_as(source_images)
+        fake = torch.zeros(source_images.shape).type_as(source_images)
         fake_loss = self.adversarial_loss(self.discriminator(fake_source_images.detach()), fake)
 
         d_loss = (real_loss + fake_loss) / 2

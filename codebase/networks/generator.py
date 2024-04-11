@@ -24,11 +24,11 @@ class Generator(nn.Module):
 
         idx = idx.long()
 
-        img = (img / 127) - 1
+        img = (img / 127.5) - 1
 
         img_trans = self.w[idx] * img + self.b[idx]
 
-        img_trans = (img_trans + 1) * 127
+        img_trans = (img_trans + 1) * 127.5
 
         img_trans = torch.transpose(img_trans, 1, 3)
         img_trans = torch.transpose(img_trans, 2, 3)

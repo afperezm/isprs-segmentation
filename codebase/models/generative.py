@@ -1,4 +1,5 @@
 import torch
+import torchvision
 
 from codebase.networks.discriminator import Discriminator
 from codebase.networks.generator import Generator
@@ -32,6 +33,11 @@ class ColorMapGAN(LightningModule):
 
         # Generate images
         fake_source_images = self.generator(target_images)
+
+        # Log sampled images
+        sample_images = fake_source_images[:6]
+        grid = torchvision.utils.make_grid(sample_images)
+        self.logger.experiment.add_image("train/generated_images", grid, 0)
 
         valid = torch.ones(source_images.size(0), 1).type_as(source_images)
         g_loss = self.adversarial_loss(self.discriminator(fake_source_images), valid)

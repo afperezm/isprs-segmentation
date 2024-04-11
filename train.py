@@ -7,6 +7,7 @@ import pytorch_lightning as pl
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.generative import ColorMapGAN
 from codebase.utils import transforms
+from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose
@@ -49,12 +50,16 @@ def main():
     logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
                                default_hp_metric=False, sub_dir="logs")
 
+    # Initialize callbacks
+    checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
+
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
 
     model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
     trainer = pl.Trainer(
         logger=logger,
+        callbacks=[checkpointing],
         accelerator="auto",
         devices=1,
         max_epochs=epochs,

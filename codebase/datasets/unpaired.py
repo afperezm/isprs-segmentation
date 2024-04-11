@@ -26,8 +26,8 @@ class UnpairedDataset(Dataset):
         path_source = os.path.join(self.source_dir, self.images_a[index % self.num_images_a])
         path_target = os.path.join(self.target_dir, self.images_b[index % self.num_images_b])
 
-        img_source = cv2.imread(path_source)
-        img_target = cv2.imread(path_target)
+        img_source = cv2.imread(path_source).astype('float32')
+        img_target = cv2.imread(path_target).astype('float32')
 
         if self.transform:
             img_source, img_target = self.transform((img_source, img_target))

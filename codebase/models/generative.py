@@ -35,15 +35,18 @@ class ColorMapGAN(LightningModule):
         fake_source_images = self.generator(target_images)
 
         # Log images
-        if self.global_step % 100 == 0:
+        if self.global_step % 1000 == 0:
             grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(0, 255))
-            self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid, global_step=0)
+            self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
+                                             global_step=int(self.global_step / 1000) % 5)
 
             grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(0, 255))
-            self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid, global_step=0)
+            self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid,
+                                             global_step=int(self.global_step / 1000) % 5)
 
             grid = torchvision.utils.make_grid(fake_source_images, normalize=True, value_range=(0, 255))
-            self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid, global_step=0)
+            self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid,
+                                             global_step=int(self.global_step / 1000) % 5)
 
         valid = torch.ones(source_images.size(0), 1, 8, 8).type_as(source_images)
         g_loss = self.adversarial_loss(self.discriminator(fake_source_images), valid)

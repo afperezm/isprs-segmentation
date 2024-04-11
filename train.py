@@ -24,6 +24,7 @@ def main():
     learning_rate_gen = PARAMS.learning_rate_gen
     learning_rate_dis = PARAMS.learning_rate_dis
     model = PARAMS.model
+    enable_progress_bar = PARAMS.enable_progress_bar
 
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
@@ -63,6 +64,7 @@ def main():
         accelerator="auto",
         devices=1,
         max_epochs=epochs,
+        enable_progress_bar=enable_progress_bar
     )
     trainer.fit(model, train_dataloaders=train_dataloader)
 
@@ -77,6 +79,7 @@ def parse_args():
     parser.add_argument("--learning_rate_gen", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--learning_rate_dis", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--model", help="Model name", choices=["colormapgan"], default="colormapgan")
+    parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     return parser.parse_args()
 
 

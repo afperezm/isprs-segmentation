@@ -1,9 +1,13 @@
 import argparse
+import os
+from time import strftime
+
 import pytorch_lightning as pl
 
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.generative import ColorMapGAN
 from codebase.utils import transforms
+from pytorch_lightning.loggers import TensorBoardLogger
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose
 
@@ -13,10 +17,20 @@ NUM_CHANNELS = 3
 def main():
     source_dir = PARAMS.source_dir
     target_dir = PARAMS.target_dir
+    results_dir = PARAMS.results_dir
     epochs = PARAMS.epochs
     batch_size = PARAMS.batch_size
     learning_rate_gen = PARAMS.learning_rate_gen
     learning_rate_dis = PARAMS.learning_rate_dis
+    model = PARAMS.model
+
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir)
+
+    results_dir_root = os.path.dirname(results_dir.rstrip('/'))
+    results_dir_name = os.path.basename(results_dir.rstrip('/'))
+
+    exp_name = f"{model}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
 
     train_dataset = UnpairedDataset(
         source_dir=source_dir,
@@ -31,8 +45,16 @@ def main():
         num_workers=8
     )
 
+    # Initialize logger
+    logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
+                               default_hp_metric=False, sub_dir="logs")
+
+    # Dump program arguments
+    logger.log_hyperparams(params=PARAMS)
+
     model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
     trainer = pl.Trainer(
+        logger=logger,
         accelerator="auto",
         devices=1,
         max_epochs=epochs,
@@ -44,10 +66,12 @@ def parse_args():
     parser = argparse.ArgumentParser("Trainer for ColorMapGAN")
     parser.add_argument("--source_dir", help="Source dataset directory", required=True)
     parser.add_argument("--target_dir", help="Target dataset directory", required=True)
+    parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
     parser.add_argument("--learning_rate_gen", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--learning_rate_dis", help="Generator learning rate", type=float, default=0.0002)
+    parser.add_argument("--model", help="Model name", choices=["colormapgan"], default="colormapgan")
     return parser.parse_args()
 
 

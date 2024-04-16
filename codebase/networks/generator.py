@@ -5,7 +5,7 @@ from torch import nn
 class ColorGenerator(nn.Module):
 
     def __init__(self):
-        super().__init__()
+        super(ColorGenerator, self).__init__()
 
         w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
         b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)

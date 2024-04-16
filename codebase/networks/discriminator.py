@@ -4,7 +4,7 @@ from torch import nn
 class Discriminator(nn.Module):
 
     def __init__(self, num_channels, num_features=64):
-        super().__init__()
+        super(Discriminator, self).__init__()
 
         self.model = nn.Sequential(
             nn.Conv2d(in_channels=num_channels, out_channels=num_features, kernel_size=4, stride=2, padding=1),

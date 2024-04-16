@@ -13,7 +13,7 @@ class ColorMapGAN(LightningModule):
                  lr_dis: float = 0.0002,
                  **kwargs
                  ):
-        super().__init__()
+        super(ColorMapGAN, self).__init__()
         self.save_hyperparameters()
         self.automatic_optimization = False
 

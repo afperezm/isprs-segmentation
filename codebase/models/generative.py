@@ -52,9 +52,9 @@ class ColorMapGAN(LightningModule):
         g_loss = self.adversarial_loss(self.discriminator(fake_source_images), valid)
 
         self.log("train/g_loss", g_loss, prog_bar=True)
+        optimizer_g.zero_grad()
         self.manual_backward(g_loss)
         optimizer_g.step()
-        optimizer_g.zero_grad()
         self.untoggle_optimizer(optimizer_g)
 
         # Train discriminator
@@ -73,9 +73,9 @@ class ColorMapGAN(LightningModule):
         d_loss = (real_loss + fake_loss) / 2
 
         self.log("train/d_loss", d_loss, prog_bar=True)
+        optimizer_d.zero_grad()
         self.manual_backward(d_loss)
         optimizer_d.step()
-        optimizer_d.zero_grad()
         self.untoggle_optimizer(optimizer_d)
 
     def configure_optimizers(self):

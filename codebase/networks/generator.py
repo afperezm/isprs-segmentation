@@ -1,5 +1,4 @@
 import torch
-from codebase.networks.utils import ConvBlock, ResNetBlock, ConvTransposeBlock
 from torch import nn
 
 
@@ -37,6 +36,53 @@ class ColorGANGenerator(nn.Module):
         img_trans = torch.transpose(img_trans, 2, 3)
 
         return img_trans
+
+
+class ConvBlock(nn.Module):
+
+    def __init__(self, channels_in, channels_out):
+        super(ConvBlock, self).__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(channels_in, channels_out, kernel_size=3, stride=2, padding=1),
+            nn.InstanceNorm2d(channels_out),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.block(x)
+
+
+class ResNetBlock(nn.Module):
+
+    def __init__(self, dim):
+        super(ResNetBlock, self).__init__()
+        self.block = nn.Sequential(
+            nn.ReflectionPad2d(1),
+            nn.Conv2d(dim, dim, kernel_size=3, stride=1),
+            nn.InstanceNorm2d(dim),
+            nn.ReLU(inplace=True),
+
+            nn.ReflectionPad2d(1),
+            nn.Conv2d(dim, dim, kernel_size=3, stride=1),
+            nn.InstanceNorm2d(dim)
+        )
+
+    def forward(self, x):
+        return self.block(x) + x
+
+
+class ConvTransposeBlock(nn.Module):
+
+    def __init__(self, channels_in, channels_out):
+        super(ConvTransposeBlock, self).__init__()
+        self.block = nn.Sequential(
+            nn.ConvTranspose2d(channels_in, channels_out, kernel_size=3, stride=2, padding=1, output_padding=1),
+            nn.InstanceNorm2d(channels_out),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.block(x)
 
 
 class ResNetGenerator(nn.Module):

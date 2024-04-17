@@ -28,6 +28,8 @@ class ColorGenerator(nn.Module):
 
         img_trans = self.w[idx] * img + self.b[idx]
 
+        img_trans = torch.clamp(img_trans, -1.0, 1.0)
+
         img_trans = (img_trans + 1) * 127.5
 
         img_trans = torch.transpose(img_trans, 1, 3)

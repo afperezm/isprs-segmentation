@@ -27,17 +27,17 @@ class ColorMapGAN(LightningModule):
         fake_source_images = self.generator(target_images)
 
         # Train generator
-        # self.toggle_optimizer(optimizer_g)
+        self.toggle_optimizer(optimizer_g)
         # valid = torch.ones(source_images.size(0), 1, 8, 8).type_as(source_images)
         pred_fake_source_images = self.discriminator(fake_source_images)
         g_loss = self.mse_loss(pred_fake_source_images, torch.ones_like(pred_fake_source_images))
         optimizer_g.zero_grad()
         self.manual_backward(g_loss)
         optimizer_g.step()
-        # self.untoggle_optimizer(optimizer_g)
+        self.untoggle_optimizer(optimizer_g)
 
         # Train discriminator
-        # self.toggle_optimizer(optimizer_d)
+        self.toggle_optimizer(optimizer_d)
         # # how well can it label as real?
         # valid = torch.ones(source_images.size(0), 1, 8, 8).type_as(source_images)
         pred_real_source_images = self.discriminator(source_images)
@@ -50,7 +50,7 @@ class ColorMapGAN(LightningModule):
         optimizer_d.zero_grad()
         self.manual_backward(d_loss)
         optimizer_d.step()
-        # self.untoggle_optimizer(optimizer_d)
+        self.untoggle_optimizer(optimizer_d)
 
         log_freq = self.hparams.log_freq
 

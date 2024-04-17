@@ -3,6 +3,7 @@ import os
 import sys
 
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 
 
 class UnpairedDataset(Dataset):
@@ -28,13 +29,12 @@ class UnpairedDataset(Dataset):
 
         img_source = cv2.imread(path_source)
         img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)
-        img_source = img_source.astype('float32')
-        img_target = cv2.imread(path_target).astype('float32')
+        img_target = cv2.imread(path_target)
         img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2RGB)
-        img_target = img_target.astype('float32')
 
         if self.transform:
-            img_source, img_target = self.transform((img_source, img_target))
+            img_source = self.transform(img_source)
+            img_target = self.transform(img_target)
 
         return img_source, img_target
 

@@ -42,7 +42,7 @@ class UnpairedDataset(Dataset):
 if __name__ == "__main__":
 
     source_data_dir = sys.argv[1]
-    target_data_dir = sys.argv[1]
+    target_data_dir = sys.argv[2]
 
     train_dataset = UnpairedDataset(source_dir=source_data_dir, target_dir=target_data_dir)
 

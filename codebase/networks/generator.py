@@ -1,4 +1,5 @@
 import torch
+from codebase.networks.utils import ConvBlock, ResNetBlock, ConvTransposeBlock
 from torch import nn
 
 
@@ -36,3 +37,30 @@ class ColorGANGenerator(nn.Module):
         img_trans = torch.transpose(img_trans, 2, 3)
 
         return img_trans
+
+
+class ResNetGenerator(nn.Module):
+
+    def __init__(self):
+        super(ResNetGenerator, self).__init__()
+
+        self.model = nn.Sequential(
+            # Encoding - First block uses reflection padding and instance norm
+            nn.ReflectionPad2d(3),
+            nn.Conv2d(3, 64, kernel_size=7, stride=1, padding=0),
+            nn.InstanceNorm2d(64),
+            nn.ReLU(inplace=True),
+            ConvBlock(64, 128),
+            ConvBlock(128, 256),
+            # Transformation - Nine residual blocks
+            *[ResNetBlock(256) for _ in range(9)],
+            # Decoding - Last block uses reflection padding but no normalization and tanh
+            ConvTransposeBlock(256, 128),
+            ConvTransposeBlock(128, 64),
+            nn.ReflectionPad2d(3),
+            nn.Conv2d(64, 3, kernel_size=7, stride=1, padding=0),
+            nn.Tanh()
+        )
+
+    def forward(self, x):
+        return self.model(x)

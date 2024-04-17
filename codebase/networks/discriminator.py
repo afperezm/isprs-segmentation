@@ -1,10 +1,10 @@
 from torch import nn
 
 
-class Discriminator(nn.Module):
+class PatchGANDiscriminator(nn.Module):
 
     def __init__(self, num_channels, num_features=64):
-        super(Discriminator, self).__init__()
+        super(PatchGANDiscriminator, self).__init__()
 
         self.model = nn.Sequential(
             nn.Conv2d(in_channels=num_channels, out_channels=num_features, kernel_size=4, stride=2, padding=1),

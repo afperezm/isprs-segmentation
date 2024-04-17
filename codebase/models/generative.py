@@ -1,12 +1,14 @@
 import torch
 import torchvision
+import pytorch_lightning as pl
 
+from codebase.models.utils import ImagePool, init_weights
 from codebase.networks.discriminator import PatchGANDiscriminator
-from codebase.networks.generator import ColorGANGenerator
-from pytorch_lightning import LightningModule
+from codebase.networks.generator import ColorGANGenerator, ResNetGenerator
+from itertools import chain
 
 
-class ColorMapGAN(LightningModule):
+class ColorMapGAN(pl.LightningModule):
     def __init__(self, num_classes, lr_gen=0.0002, lr_dis=0.0002, log_freq=False):
         super(ColorMapGAN, self).__init__()
 
@@ -79,3 +81,132 @@ class ColorMapGAN(LightningModule):
         optimizer_d = torch.optim.Adam(self.discriminator.parameters(), lr=lr_dis)
 
         return [optimizer_g, optimizer_d], []
+
+
+class CycleGAN(pl.LightningModule):
+    def __init__(self, lr_gen=0.0002, lr_dis=0.0002):
+        super(CycleGAN, self).__init__()
+
+        self.save_hyperparameters()
+        self.automatic_optimization = False
+
+        # generator pair
+        self.gen_x = ResNetGenerator()
+        self.gen_y = ResNetGenerator()
+
+        # discriminator pair
+        self.dis_x = PatchGANDiscriminator(num_channels=3, num_features=64)
+        self.dis_y = PatchGANDiscriminator(num_channels=3, num_features=64)
+
+        self.lm = 10.0
+
+        self.fake_a = None
+        self.fake_b = None
+
+        self.fake_pool_a = ImagePool()
+        self.fake_pool_b = ImagePool()
+
+        self.criterion = torch.nn.MSELoss()
+
+        for m in [self.gen_x, self.gen_y, self.dis_x, self.dis_y]:
+            init_weights(m)
+
+    def generator_training_step(self, img_a, img_b):
+        fake_b = self.gen_x(img_a)
+        cycled_a = self.gen_y(fake_b)
+
+        fake_a = self.gen_y(img_b)
+        cycled_b = self.gen_x(fake_a)
+
+        same_b = self.gen_x(img_b)
+        same_a = self.gen_y(img_a)
+
+        # generator gen_x must fool discriminator dis_y so label is all ones (real)
+        pred_fake_b = self.dis_y(fake_b)
+        mse_gen_b = self.criterion(pred_fake_b, torch.ones_like(pred_fake_b))
+
+        # generator gen_y must fool discriminator dis_x so label is all ones (real)
+        pred_fake_a = self.dis_x(fake_a)
+        mse_gen_a = self.criterion(pred_fake_a, torch.ones_like(pred_fake_a))
+
+        # compute extra losses
+        identity_loss = torch.nn.functional.l1_loss(same_a, img_a) + torch.nn.functional.l1_loss(same_b, img_b)
+
+        # compute cycleLosses
+        cycle_loss = torch.nn.functional.l1_loss(cycled_a, img_a) + torch.nn.functional.l1_loss(cycled_b, img_b)
+
+        # gather all losses
+        extra_loss = cycle_loss + 0.5 * identity_loss
+        gen_loss = mse_gen_a + mse_gen_b + self.lm * extra_loss
+
+        # store detached generated images
+        self.fake_a = fake_a.detach()
+        self.fake_b = fake_b.detach()
+
+        return gen_loss
+
+    def discriminator_training_step(self, img_a, img_b):
+        fake_a = self.fake_pool_a.query(self.fake_a)
+        fake_b = self.fake_pool_b.query(self.fake_b)
+
+        # disX checks for domain A photos
+        pred_real_a = self.dis_x(img_a)
+        mse_real_a = self.criterion(pred_real_a, torch.ones_like(pred_real_a))
+
+        pred_fake_a = self.dis_x(fake_a)
+        mse_fake_a = self.criterion(pred_fake_a, torch.zeros_like(pred_fake_a))
+
+        # disY checks for domain B photos
+        pred_real_b = self.dis_y(img_b)
+        mse_real_b = self.criterion(pred_real_b, torch.ones_like(pred_real_b))
+
+        pred_fake_b = self.dis_y(fake_b)
+        mse_fake_b = self.criterion(pred_fake_b, torch.zeros_like(pred_fake_b))
+
+        # gather all losses
+        dis_loss_a = 0.5 * (mse_fake_a + mse_real_a)
+        dis_loss_b = 0.5 * (mse_fake_b + mse_real_b)
+
+        return dis_loss_a, dis_loss_b
+
+    def training_step(self, batch, batch_idx):
+
+        g_optimizer, d_optimizer = self.optimizers()
+
+        img_a, img_b = batch
+
+        self.toggle_optimizer(g_optimizer)
+        g_loss = self.generator_training_step(img_a, img_b)
+        g_optimizer.zero_grad()
+        self.manual_backward(g_loss)
+        g_optimizer.step()
+        self.untoggle_optimizer(g_optimizer)
+
+        self.toggle_optimizer(d_optimizer)
+        dis_loss_a, dis_loss_b = self.discriminator_training_step(img_a, img_b)
+        d_optimizer.zero_grad()
+        self.manual_backward(dis_loss_a)
+        self.manual_backward(dis_loss_b)
+        d_optimizer.step()
+        self.untoggle_optimizer(d_optimizer)
+
+        self.log_dict({"train/g_loss": g_loss, "train/d_loss_a": dis_loss_a, "train/d_loss_b": dis_loss_b},
+                      prog_bar=True)
+
+    def configure_optimizers(self):
+        lr_gen = self.hparams.lr_gen
+        lr_dis = self.hparams.lr_dis
+
+        g_optimizer = torch.optim.Adam(chain(self.gen_x.parameters(), self.gen_y.parameters()),
+                                       lr=lr_gen, betas=(0.5, 0.999))
+
+        d_optimizer = torch.optim.Adam(chain(self.dis_x.parameters(), self.dis_y.parameters()),
+                                       lr=lr_dis, betas=(0.5, 0.999))
+
+        def gamma(epoch):
+            return 1 - max(0, epoch + 1 - 100) / 101
+
+        g_scheduler = torch.optim.lr_scheduler.LambdaLR(g_optimizer, lr_lambda=gamma)
+        d_scheduler = torch.optim.lr_scheduler.LambdaLR(d_optimizer, lr_lambda=gamma)
+
+        return [g_optimizer, d_optimizer], [g_scheduler, d_scheduler]

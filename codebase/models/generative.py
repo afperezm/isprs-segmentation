@@ -7,7 +7,7 @@ from pytorch_lightning import LightningModule
 
 
 class ColorMapGAN(LightningModule):
-    def __init__(self, num_classes, lr_gen=0.0002, lr_dis=0.0002):
+    def __init__(self, num_classes, lr_gen=0.0002, lr_dis=0.0002, log_freq=False):
         super(ColorMapGAN, self).__init__()
 
         self.save_hyperparameters()
@@ -51,19 +51,21 @@ class ColorMapGAN(LightningModule):
         optimizer_d.step()
         self.untoggle_optimizer(optimizer_d)
 
+        log_freq = self.hparams.log_freq
+
         # Log images
-        if self.global_step % 1000 == 0:
+        if self.global_step % log_freq == 0:
             grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
-                                             global_step=int(self.global_step / 1000) % 5)
+                                             global_step=int(self.global_step / log_freq) % 5)
 
             grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid,
-                                             global_step=int(self.global_step / 1000) % 5)
+                                             global_step=int(self.global_step / log_freq) % 5)
 
             grid = torchvision.utils.make_grid(fake_source_images, normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid,
-                                             global_step=int(self.global_step / 1000) % 5)
+                                             global_step=int(self.global_step / log_freq) % 5)
 
         self.log("train/g_loss", g_loss, prog_bar=True)
         self.log("train/d_loss", d_loss, prog_bar=True)

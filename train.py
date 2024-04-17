@@ -24,6 +24,7 @@ def main():
     learning_rate_gen = PARAMS.learning_rate_gen
     learning_rate_dis = PARAMS.learning_rate_dis
     model = PARAMS.model
+    log_freq = PARAMS.log_freq
     enable_progress_bar = PARAMS.enable_progress_bar
 
     if not os.path.exists(results_dir):
@@ -57,7 +58,7 @@ def main():
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
 
-    model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
+    model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis, log_freq=log_freq)
     trainer = pl.Trainer(
         logger=logger,
         callbacks=[checkpointing],
@@ -79,6 +80,7 @@ def parse_args():
     parser.add_argument("--learning_rate_gen", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--learning_rate_dis", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--model", help="Model name", choices=["colormapgan"], default="colormapgan")
+    parser.add_argument("--log_freq", help="Frequency of logging images", type=int, default=1000)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     return parser.parse_args()
 

@@ -70,8 +70,7 @@ class ColorMapGAN(pl.LightningModule):
             self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 
-        self.log("train/g_loss", g_loss, prog_bar=True)
-        self.log("train/d_loss", d_loss, prog_bar=True)
+        self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

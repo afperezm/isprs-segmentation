@@ -14,6 +14,7 @@ class ColorMapGAN(LightningModule):
                  **kwargs
                  ):
         super(ColorMapGAN, self).__init__()
+
         self.save_hyperparameters()
         self.automatic_optimization = False
 
@@ -51,7 +52,7 @@ class ColorMapGAN(LightningModule):
         valid = torch.ones(source_images.size(0), 1, 8, 8).type_as(source_images)
         g_loss = self.adversarial_loss(self.discriminator(fake_source_images), valid)
 
-        self.log("train/g_loss", g_loss, prog_bar=True)
+
         optimizer_g.zero_grad()
         self.manual_backward(g_loss)
         optimizer_g.step()
@@ -72,11 +73,13 @@ class ColorMapGAN(LightningModule):
 
         d_loss = (real_loss + fake_loss) / 2
 
-        self.log("train/d_loss", d_loss, prog_bar=True)
         optimizer_d.zero_grad()
         self.manual_backward(d_loss)
         optimizer_d.step()
         self.untoggle_optimizer(optimizer_d)
+
+        self.log("train/g_loss", g_loss, prog_bar=True)
+        self.log("train/d_loss", d_loss, prog_bar=True)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

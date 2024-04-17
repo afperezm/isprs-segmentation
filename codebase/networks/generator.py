@@ -2,10 +2,10 @@ import torch
 from torch import nn
 
 
-class ColorGenerator(nn.Module):
+class ColorGANGenerator(nn.Module):
 
     def __init__(self):
-        super(ColorGenerator, self).__init__()
+        super(ColorGANGenerator, self).__init__()
 
         w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
         b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)

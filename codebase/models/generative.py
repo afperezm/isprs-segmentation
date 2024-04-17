@@ -2,7 +2,7 @@ import torch
 import torchvision
 
 from codebase.networks.discriminator import PatchGANDiscriminator
-from codebase.networks.generator import ColorGenerator
+from codebase.networks.generator import ColorGANGenerator
 from pytorch_lightning import LightningModule
 
 
@@ -14,7 +14,7 @@ class ColorMapGAN(LightningModule):
         self.automatic_optimization = False
 
         # Networks
-        self.generator = ColorGenerator()
+        self.generator = ColorGANGenerator()
         self.discriminator = PatchGANDiscriminator(num_channels=num_classes, num_features=64)
 
         self.mse_loss = torch.nn.MSELoss()

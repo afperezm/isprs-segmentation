@@ -41,7 +41,7 @@ class ColorMapGAN(LightningModule):
         # # how well can it label as real?
         # valid = torch.ones(source_images.size(0), 1, 8, 8).type_as(source_images)
         pred_real_source_images = self.discriminator(source_images)
-        real_loss = self.mse_loss(pred_real_source_images, torch.zeros_like(pred_real_source_images))
+        real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
         # # how well can it label as fake?
         # fake = torch.zeros(source_images.size(0), 1, 8, 8).type_as(source_images)
         pred_fake_source_images = self.discriminator(fake_source_images.detach())

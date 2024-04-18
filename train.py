@@ -58,9 +58,9 @@ def main():
     logger.log_hyperparams(params=PARAMS)
 
     if model == "cyclegan":
-        model = CycleGAN(lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
+        gan_model = CycleGAN(lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
     elif model == "colormapgan":
-        model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis,
+        gan_model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis,
                             log_freq=log_freq)
     else:
         raise ValueError("Invalid model selection")
@@ -73,7 +73,7 @@ def main():
         max_epochs=epochs,
         enable_progress_bar=enable_progress_bar
     )
-    trainer.fit(model, train_dataloaders=train_dataloader)
+    trainer.fit(gan_model, train_dataloaders=train_dataloader)
 
 
 def parse_args():

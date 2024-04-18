@@ -83,7 +83,7 @@ class ColorMapGAN(pl.LightningModule):
 
 
 class CycleGAN(pl.LightningModule):
-    def __init__(self, lr_gen=0.0002, lr_dis=0.0002):
+    def __init__(self, lr_gen=0.0002, lr_dis=0.0002, lambda_cycle=10.0, lambda_identity=0.0):
         super(CycleGAN, self).__init__()
 
         self.save_hyperparameters()
@@ -97,8 +97,6 @@ class CycleGAN(pl.LightningModule):
         self.dis_x = PatchGANDiscriminator(num_channels=3, num_features=64)
         self.dis_y = PatchGANDiscriminator(num_channels=3, num_features=64)
 
-        self.lm = 10.0
-
         self.fake_a = None
         self.fake_b = None
 
@@ -111,6 +109,9 @@ class CycleGAN(pl.LightningModule):
             init_weights(m)
 
     def generator_training_step(self, img_a, img_b):
+        lambda_cycle = self.hparams.lambda_cycle
+        lambda_identity = self.hparams.lambda_identity
+
         fake_b = self.gen_x(img_a)
         cycled_a = self.gen_y(fake_b)
 
@@ -135,8 +136,7 @@ class CycleGAN(pl.LightningModule):
         cycle_loss = torch.nn.functional.l1_loss(cycled_a, img_a) + torch.nn.functional.l1_loss(cycled_b, img_b)
 
         # gather all losses
-        extra_loss = cycle_loss + 0.5 * identity_loss
-        gen_loss = mse_gen_a + mse_gen_b + self.lm * extra_loss
+        gen_loss = mse_gen_a + mse_gen_b + lambda_cycle * cycle_loss + lambda_identity * identity_loss
 
         # store detached generated images
         self.fake_a = fake_a.detach()
@@ -163,10 +163,9 @@ class CycleGAN(pl.LightningModule):
         mse_fake_b = self.criterion(pred_fake_b, torch.zeros_like(pred_fake_b))
 
         # gather all losses
-        dis_loss_a = 0.5 * (mse_fake_a + mse_real_a)
-        dis_loss_b = 0.5 * (mse_fake_b + mse_real_b)
+        dis_loss = 0.5 * (mse_real_a + mse_fake_a + mse_real_b + mse_fake_b)
 
-        return dis_loss_a, dis_loss_b
+        return dis_loss
 
     def training_step(self, batch, batch_idx):
 
@@ -182,15 +181,13 @@ class CycleGAN(pl.LightningModule):
         self.untoggle_optimizer(g_optimizer)
 
         self.toggle_optimizer(d_optimizer)
-        dis_loss_a, dis_loss_b = self.discriminator_training_step(img_a, img_b)
+        d_loss = self.discriminator_training_step(img_a, img_b)
         d_optimizer.zero_grad()
-        self.manual_backward(dis_loss_a)
-        self.manual_backward(dis_loss_b)
+        self.manual_backward(d_loss)
         d_optimizer.step()
         self.untoggle_optimizer(d_optimizer)
 
-        self.log_dict({"train/g_loss": g_loss, "train/d_loss_a": dis_loss_a, "train/d_loss_b": dis_loss_b},
-                      prog_bar=True)
+        self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

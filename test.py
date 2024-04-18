@@ -57,7 +57,7 @@ def main():
 
         image_a2b, image_b2a = result
 
-        image_a_name = test_dataset.images_a[idx]
+        image_a_name = test_dataset.images_a[idx % test_dataset.num_images_a]
 
         print(image_a_name)
 
@@ -68,7 +68,7 @@ def main():
 
         _ = cv2.imwrite(os.path.join(output_dir, exp_name, image_a_name), image_a2b)
 
-        image_b_name = test_dataset.images_b[idx]
+        image_b_name = test_dataset.images_b[idx % test_dataset.num_images_b]
 
         print(image_b_name)
 

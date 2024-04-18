@@ -1,3 +1,9 @@
+""" PyTorch CycleGAN supporting methods and classes.
+
+Credits:
+This code is adapted from Deepak H R's Lightning CycleGAN: https://github.com/deepakhr1999/cyclegans
+"""
+
 import random
 import torch
 

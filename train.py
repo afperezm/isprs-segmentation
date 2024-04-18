@@ -60,8 +60,7 @@ def main():
     if model == "cyclegan":
         gan_model = CycleGAN(lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
     elif model == "colormapgan":
-        gan_model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis,
-                            log_freq=log_freq)
+        gan_model = ColorMapGAN(lr_gen=learning_rate_gen, lr_dis=learning_rate_dis, log_freq=log_freq)
     else:
         raise ValueError("Invalid model selection")
 

@@ -9,7 +9,7 @@ from itertools import chain
 
 
 class ColorMapGAN(pl.LightningModule):
-    def __init__(self, num_classes, lr_gen=0.0002, lr_dis=0.0002, log_freq=False):
+    def __init__(self, lr_gen=0.0002, lr_dis=0.0002, log_freq=False):
         super(ColorMapGAN, self).__init__()
 
         self.save_hyperparameters()
@@ -17,7 +17,7 @@ class ColorMapGAN(pl.LightningModule):
 
         # Networks
         self.generator = ColorGANGenerator()
-        self.discriminator = PatchGANDiscriminator(num_channels=num_classes, num_features=64)
+        self.discriminator = PatchGANDiscriminator(num_channels=3, num_features=64)
 
         self.mse_loss = torch.nn.MSELoss()
 

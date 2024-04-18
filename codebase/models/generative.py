@@ -189,6 +189,17 @@ class CycleGAN(pl.LightningModule):
 
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
+    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+        img_a, img_b = batch
+
+        img_a2b = self.gen_x(img_a)
+        img_b2a = self.gen_y(img_b)
+
+        img_a2b = img_a2b * 0.5 + 0.5
+        img_b2a = img_b2a * 0.5 + 0.5
+
+        return img_a2b, img_b2a
+
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen
         lr_dis = self.hparams.lr_dis

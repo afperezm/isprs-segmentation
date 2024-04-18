@@ -63,6 +63,7 @@ def main():
 
         image_a2b = np.transpose(image_a2b.cpu().detach().numpy().squeeze(), (1, 2, 0))
         image_a2b = (255 * image_a2b).astype(np.uint8)
+        image_a2b = cv2.cvtColor(image_a2b, cv2.COLOR_RGB2BGR)
 
         print(image_a2b.shape, np.min(image_a2b), np.max(image_a2b))
 
@@ -74,6 +75,7 @@ def main():
 
         image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
         image_b2a = (255 * image_b2a).astype(np.uint8)
+        image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
 
         print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
 

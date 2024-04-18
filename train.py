@@ -5,7 +5,7 @@ from time import strftime
 import pytorch_lightning as pl
 
 from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models.generative import ColorMapGAN
+from codebase.models.generative import ColorMapGAN, CycleGAN
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch.utils.data import DataLoader
@@ -57,7 +57,14 @@ def main():
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
 
-    model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis, log_freq=log_freq)
+    if model == "cyclegan":
+        model = CycleGAN(lr_gen=learning_rate_gen, lr_dis=learning_rate_dis)
+    elif model == "colormapgan":
+        model = ColorMapGAN(num_classes=NUM_CHANNELS, lr_gen=learning_rate_gen, lr_dis=learning_rate_dis,
+                            log_freq=log_freq)
+    else:
+        raise ValueError("Invalid model selection")
+
     trainer = pl.Trainer(
         logger=logger,
         callbacks=[checkpointing],
@@ -78,7 +85,7 @@ def parse_args():
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
     parser.add_argument("--learning_rate_gen", help="Generator learning rate", type=float, default=0.0002)
     parser.add_argument("--learning_rate_dis", help="Generator learning rate", type=float, default=0.0002)
-    parser.add_argument("--model", help="Model name", choices=["colormapgan"], default="colormapgan")
+    parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
     parser.add_argument("--log_freq", help="Frequency of logging images", type=int, default=1000)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     return parser.parse_args()

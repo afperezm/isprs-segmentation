@@ -3,13 +3,15 @@ import os
 from time import strftime
 
 import pytorch_lightning as pl
+# from torchvision.transforms import ToTensor, Normalize
 
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.generative import ColorMapGAN, CycleGAN
+from codebase.utils.transforms import ToTensor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from torch.utils.data import DataLoader
-from torchvision import transforms
+# from torchvision import transforms
 
 NUM_CHANNELS = 3
 
@@ -37,7 +39,8 @@ def main():
     train_dataset = UnpairedDataset(
         source_dir=source_dir,
         target_dir=target_dir,
-        transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
+        # transform=transforms.Compose([ToTensor(), Normalize([.5, .5, .5], [.5, .5, .5])])
+        transform=ToTensor()
     )
 
     train_dataloader = DataLoader(

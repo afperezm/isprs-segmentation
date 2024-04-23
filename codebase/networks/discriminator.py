@@ -29,5 +29,6 @@ class PatchGANDiscriminator(nn.Module):
         )
 
     def forward(self, x):
-        out = self.model(x)
+        x_norm = (x.float() / 127.5) - 1
+        out = self.model(x_norm)
         return out

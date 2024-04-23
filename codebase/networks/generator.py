@@ -24,13 +24,13 @@ class ColorGANGenerator(nn.Module):
 
         idx = idx.long()
 
-        img = (img / 127.5) - 1
+        img_norm = (img.float() / 127.5) - 1
 
-        img_trans = self.w[idx] * img + self.b[idx]
+        img_trans = self.w[idx] * img_norm + self.b[idx]
 
         img_trans = torch.clamp(img_trans, -1.0, 1.0)
 
-        img_trans = (img_trans + 1) * 127.5
+        img_trans = ((img_trans + 1) * 127.5).byte()
 
         img_trans = torch.transpose(img_trans, 1, 3)
         img_trans = torch.transpose(img_trans, 2, 3)

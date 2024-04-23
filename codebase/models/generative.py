@@ -55,12 +55,12 @@ class ColorMapGAN(pl.LightningModule):
         # Log images
         if self.global_step % log_freq == 0:
             for tag, value in self.named_parameters():
-                self.logger.add_histogram(tag + "/grad", value, self.global_step)
-            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(0, 255))
+                self.logger.experiment.add_histogram("train/" + tag, value, self.global_step)
+            grid = torchvision.utils.make_grid(source_images.float(), normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 
-            grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(0, 255))
+            grid = torchvision.utils.make_grid(target_images.float(), normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 
@@ -166,7 +166,6 @@ class CycleGAN(pl.LightningModule):
         return dis_loss
 
     def training_step(self, batch, batch_idx):
-
         g_optimizer, d_optimizer = self.optimizers()
 
         img_a, img_b = batch

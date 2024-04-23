@@ -6,7 +6,7 @@ class ConvBlock(nn.Module):
         super(ConvBlock, self).__init__()
         self.block = nn.Sequential(
             nn.Conv2d(channels_in, channels_out, kernel_size=4, stride=2, padding=1),
-            nn.InstanceNorm2d(channels_out),
+            # nn.InstanceNorm2d(channels_out),
             nn.LeakyReLU(negative_slope=0.2, inplace=True),
         )
 

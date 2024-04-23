@@ -7,6 +7,12 @@ class ColorGANGenerator(nn.Module):
     def __init__(self):
         super(ColorGANGenerator, self).__init__()
 
+        # self.w = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
+        # self.b = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
+        #
+        # nn.init.ones_(self.w)
+        # nn.init.zeros_(self.b)
+
         w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
         b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)
 
@@ -28,7 +34,7 @@ class ColorGANGenerator(nn.Module):
 
         img_trans = torch.clamp(img_trans, -1.0, 1.0)
 
-        img_trans = ((img_trans + 1) * 127.5).byte()
+        img_trans = torch.trunc((img_trans + 1) * 127.5)
 
         img_trans = torch.transpose(img_trans, 1, 3)
         img_trans = torch.transpose(img_trans, 2, 3)

@@ -7,20 +7,20 @@ class ColorGANGenerator(nn.Module):
     def __init__(self):
         super(ColorGANGenerator, self).__init__()
 
-        # self.w = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
-        # self.b = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
+        self.w = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
+        self.b = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
+
+        nn.init.ones_(self.w)
+        nn.init.zeros_(self.b)
+
+        # w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
+        # b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)
         #
-        # nn.init.ones_(self.w)
-        # nn.init.zeros_(self.b)
-
-        w = torch.ones([256 * 256 * 256, 3], requires_grad=True)
-        b = torch.zeros([256 * 256 * 256, 3], requires_grad=True)
-
-        self.w = nn.Parameter(w)
-        self.b = nn.Parameter(b)
-
-        self.register_parameter("weight_trans", self.w)
-        self.register_parameter("bias_trans", self.b)
+        # self.w = nn.Parameter(w)
+        # self.b = nn.Parameter(b)
+        #
+        # self.register_parameter("weight_trans", self.w)
+        # self.register_parameter("bias_trans", self.b)
 
     def forward(self, img):
         img = torch.transpose(img, 1, 3)

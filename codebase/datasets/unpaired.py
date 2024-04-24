@@ -21,8 +21,8 @@ class UnpairedDataset(Dataset):
         else:
             self.phase = self.test_phase
 
-        self.images_a = os.listdir(source_dir)
-        self.images_b = os.listdir(target_dir)
+        self.images_a = os.listdir(os.path.join(source_dir, self.phase, 'images'))
+        self.images_b = os.listdir(os.path.join(target_dir, self.phase, 'images'))
 
         self.num_images_a = len(self.images_a)
         self.num_images_b = len(self.images_b)

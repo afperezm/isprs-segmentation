@@ -18,7 +18,7 @@ class ColorGANGenerator(nn.Module):
         img_g = (img[:, 1, :, :] + 1) * 127.5
         img_b = (img[:, 2, :, :] + 1) * 127.5
 
-        idx = img_r * 256 * 256 + img_g[:, 1, :, :] * 256 + img_b[:, 2, :, :]
+        idx = img_r * 256 * 256 + img_g * 256 + img_b
         idx = idx.long()
 
         img_trans = self.weight[idx] * img + self.bias[idx]

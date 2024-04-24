@@ -186,6 +186,27 @@ class CycleGAN(pl.LightningModule):
 
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
+    def validation_step(self, batch):
+        img_a, img_b = batch
+
+        global_step = self.global_step
+        tensorboard = self.logger.experiment
+
+        fake_b = self.gen_x(img_a)
+        fake_a = self.gen_y(img_b)
+
+        grid = torchvision.utils.make_grid(img_a, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=global_step)
+
+        grid = torchvision.utils.make_grid(fake_b, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/source_images_adapted", img_tensor=grid, global_step=global_step)
+
+        grid = torchvision.utils.make_grid(img_b, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=global_step)
+
+        grid = torchvision.utils.make_grid(fake_a, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=global_step)
+
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         img_a, img_b = batch
 

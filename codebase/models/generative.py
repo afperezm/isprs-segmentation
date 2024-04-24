@@ -9,7 +9,7 @@ from itertools import chain
 
 
 class ColorMapGAN(pl.LightningModule):
-    def __init__(self, lr_gen=0.0002, lr_dis=0.0002, log_freq=False):
+    def __init__(self, lr_gen=0.0002, lr_dis=0.0002, log_freq=1000):
         super(ColorMapGAN, self).__init__()
 
         self.save_hyperparameters()

@@ -34,7 +34,7 @@ class UnpairedDataset(Dataset):
 
     def __getitem__(self, index):
         path_source = os.path.join(self.source_dir, self.phase, 'images', self.images_a[index % self.num_images_a])
-        path_target = os.path.join(self.target_dir, self.phase, 'labels', self.images_b[index % self.num_images_b])
+        path_target = os.path.join(self.target_dir, self.phase, 'images', self.images_b[index % self.num_images_b])
 
         img_source = cv2.imread(path_source)
         img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)

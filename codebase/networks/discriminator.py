@@ -37,5 +37,4 @@ class PatchGANDiscriminator(nn.Module):
         )
 
     def forward(self, x):
-        out = self.model((x.float() / 127.5) - 1)
-        return out
+        return self.model(x)

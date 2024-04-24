@@ -1,17 +1,14 @@
 import argparse
 import os
-from time import strftime
-
 import pytorch_lightning as pl
-# from torchvision.transforms import ToTensor, Normalize
 
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.generative import ColorMapGAN, CycleGAN
-from codebase.utils.transforms import ToTensor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
+from time import strftime
 from torch.utils.data import DataLoader
-# from torchvision import transforms
+from torchvision.transforms import Compose, ToTensor, Normalize
 
 
 def main():
@@ -37,8 +34,7 @@ def main():
     train_dataset = UnpairedDataset(
         source_dir=source_dir,
         target_dir=target_dir,
-        # transform=transforms.Compose([ToTensor(), Normalize([.5, .5, .5], [.5, .5, .5])])
-        transform=ToTensor()
+        transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
     )
 
     train_dataloader = DataLoader(

@@ -40,3 +40,9 @@ python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/d
 python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.001 --learning_rate_dis 0.0001 --model colormapgan
 python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.0001 --learning_rate_dis 0.00001 --model colormapgan
 ```
+
+## Test domain adaptation models
+
+```bash
+python -u test.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --output_dir ./submits/ --checkpoints_dir ./results/cyclegan-240417-202255/checkpoints/ --model epoch=4-step=158700.ckpt --enable_progress_bar
+```

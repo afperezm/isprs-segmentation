@@ -13,8 +13,6 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from torch.utils.data import DataLoader
 # from torchvision import transforms
 
-NUM_CHANNELS = 3
-
 
 def main():
     source_dir = PARAMS.source_dir

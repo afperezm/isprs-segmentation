@@ -83,8 +83,10 @@ def parse_args():
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
-    parser.add_argument("--learning_rate_gen", help="Generator learning rate", dest="lr_gen", type=float, default=0.0002)
-    parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float, default=0.0002)
+    parser.add_argument("--learning_rate_gen", help="Generator learning rate", dest="lr_gen", type=float,
+                        default=0.0002)
+    parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float,
+                        default=0.0002)
     parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
     parser.add_argument("--log_freq", help="Frequency of logging images", type=int, default=1000)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")

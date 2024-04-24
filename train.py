@@ -20,7 +20,6 @@ def main():
     lr_gen = PARAMS.lr_gen
     lr_dis = PARAMS.lr_dis
     model = PARAMS.model
-    log_freq = PARAMS.log_freq
     enable_progress_bar = PARAMS.enable_progress_bar
 
     if not os.path.exists(results_dir):
@@ -57,7 +56,7 @@ def main():
     if model == "cyclegan":
         gan_model = CycleGAN(lr_gen=lr_gen, lr_dis=lr_dis)
     elif model == "colormapgan":
-        gan_model = ColorMapGAN(lr_gen=lr_gen, lr_dis=lr_dis, log_freq=log_freq)
+        gan_model = ColorMapGAN(lr_gen=lr_gen, lr_dis=lr_dis)
     else:
         raise ValueError("Invalid model selection")
 
@@ -84,7 +83,6 @@ def parse_args():
     parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float,
                         default=0.0002)
     parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
-    parser.add_argument("--log_freq", help="Frequency of logging images", type=int, default=1000)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     return parser.parse_args()
 

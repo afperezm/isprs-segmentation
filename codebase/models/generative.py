@@ -54,8 +54,10 @@ class ColorMapGAN(pl.LightningModule):
 
         # Log images
         if self.global_step % log_freq == 0:
-            for tag, value in self.named_parameters():
-                self.logger.experiment.add_histogram("train/" + tag, value, self.global_step)
+
+            # for tag, value in self.named_parameters():
+            #     self.logger.experiment.add_histogram("train/" + tag, value, self.global_step)
+
             grid = torchvision.utils.make_grid(source_images.float(), normalize=True, value_range=(0, 255))
             self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)

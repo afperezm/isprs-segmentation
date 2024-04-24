@@ -28,3 +28,15 @@ python -u utils/dataset_split.py --images_dir $HOME/data/Potsdam/2_Ortho_RGB/ --
 ```bash
 python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-dataset/ --patch_size 256 --stride 256 --scale 1.8 --seed 42 --crop
 ```
+
+## Train domain adaptation models
+
+```bash
+python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset// --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan
+```
+
+```bash
+python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.0005 --learning_rate_dis 0.0001 --model colormapgan
+python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.001 --learning_rate_dis 0.0001 --model colormapgan
+python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.0001 --learning_rate_dis 0.00001 --model colormapgan
+```

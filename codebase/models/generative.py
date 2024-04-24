@@ -59,15 +59,15 @@ class ColorMapGAN(pl.LightningModule):
             # for tag, value in self.named_parameters():
             #     self.logger.experiment.add_histogram("train/" + tag, value, self.global_step)
 
-            grid = torchvision.utils.make_grid(source_images.float(), normalize=True, value_range=(0, 255))
+            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
             self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 
-            grid = torchvision.utils.make_grid(target_images.float(), normalize=True, value_range=(0, 255))
+            grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
             self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 
-            grid = torchvision.utils.make_grid(fake_source_images, normalize=True, value_range=(0, 255))
+            grid = torchvision.utils.make_grid(fake_source_images, normalize=True, value_range=(-1, 1))
             self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid,
                                              global_step=int(self.global_step / log_freq) % 5)
 

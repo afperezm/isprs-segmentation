@@ -17,7 +17,7 @@ class ColorMapGAN(pl.LightningModule):
 
         # Networks
         self.generator = ColorGANGenerator()
-        self.discriminator = PatchGANDiscriminator(num_channels=3, num_features=64)
+        self.discriminator = PatchGANDiscriminator(num_channels=3, num_features=32)
 
         self.mse_loss = torch.nn.MSELoss()
 

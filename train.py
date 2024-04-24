@@ -1,6 +1,7 @@
 import argparse
 import os
 import pytorch_lightning as pl
+import torch
 
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.generative import ColorMapGAN, CycleGAN
@@ -21,6 +22,7 @@ def main():
     lr_dis = PARAMS.lr_dis
     model = PARAMS.model
     enable_progress_bar = PARAMS.enable_progress_bar
+    seed = PARAMS.seed
 
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
@@ -29,6 +31,8 @@ def main():
     results_dir_name = os.path.basename(results_dir.rstrip('/'))
 
     exp_name = f"{model}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
+
+    generator = torch.Generator().manual_seed(seed)
 
     train_dataset = UnpairedDataset(
         source_dir=source_dir,
@@ -40,7 +44,8 @@ def main():
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=8
+        num_workers=8,
+        generator=generator
     )
 
     # Initialize logger
@@ -84,6 +89,7 @@ def parse_args():
                         default=0.0002)
     parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
+    parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
     return parser.parse_args()
 
 

@@ -6,10 +6,20 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class UnpairedDataset(Dataset):
-    def __init__(self, source_dir, target_dir, transform=None):
+
+    train_phase = 'train'
+    test_phase = 'test'
+
+    def __init__(self, source_dir, target_dir, is_train=True, transform=None):
         self.source_dir = source_dir
         self.target_dir = target_dir
+        self.is_train = is_train
         self.transform = transform
+
+        if self.is_train:
+            self.phase = self.train_phase
+        else:
+            self.phase = self.test_phase
 
         self.images_a = os.listdir(source_dir)
         self.images_b = os.listdir(target_dir)
@@ -23,8 +33,8 @@ class UnpairedDataset(Dataset):
         return self.num_images
 
     def __getitem__(self, index):
-        path_source = os.path.join(self.source_dir, self.images_a[index % self.num_images_a])
-        path_target = os.path.join(self.target_dir, self.images_b[index % self.num_images_b])
+        path_source = os.path.join(self.source_dir, self.phase, 'images', self.images_a[index % self.num_images_a])
+        path_target = os.path.join(self.target_dir, self.phase, 'labels', self.images_b[index % self.num_images_b])
 
         img_source = cv2.imread(path_source)
         img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)

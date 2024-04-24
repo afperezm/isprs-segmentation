@@ -30,9 +30,24 @@ def main():
     if not os.path.exists(os.path.join(output_dir, exp_name)):
         os.makedirs(os.path.join(output_dir, exp_name))
 
+    train_dataset = UnpairedDataset(
+        source_dir=source_dir,
+        target_dir=target_dir,
+        is_train=True,
+        transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
+    )
+
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=8
+    )
+
     test_dataset = UnpairedDataset(
         source_dir=source_dir,
         target_dir=target_dir,
+        is_train=False,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
@@ -50,7 +65,7 @@ def main():
                          enable_model_summary=False)
 
     # Perform prediction
-    results = trainer.predict(model=gan_model, dataloaders=test_dataloader)
+    results = trainer.predict(model=gan_model, dataloaders=[train_dataloader, test_dataloader])
 
     # Print prediction results
     for idx, result in enumerate(results):

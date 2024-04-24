@@ -37,6 +37,7 @@ def main():
     train_dataset = UnpairedDataset(
         source_dir=source_dir,
         target_dir=target_dir,
+        is_train=True,
         transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
     )
 
@@ -44,6 +45,21 @@ def main():
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
+        num_workers=8,
+        generator=generator
+    )
+
+    valid_dataset = UnpairedDataset(
+        source_dir=source_dir,
+        target_dir=target_dir,
+        is_train=False,
+        transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+    )
+
+    valid_dataloader = DataLoader(
+        valid_dataset,
+        batch_size=batch_size,
+        shuffle=False,
         num_workers=8,
         generator=generator
     )
@@ -73,7 +89,7 @@ def main():
         max_epochs=epochs,
         enable_progress_bar=enable_progress_bar
     )
-    trainer.fit(gan_model, train_dataloaders=train_dataloader)
+    trainer.fit(gan_model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
 
 
 def parse_args():

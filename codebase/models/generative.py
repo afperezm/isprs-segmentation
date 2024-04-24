@@ -51,27 +51,24 @@ class ColorMapGAN(pl.LightningModule):
         optimizer_d.step()
         self.untoggle_optimizer(optimizer_d)
 
-        log_freq = self.hparams.log_freq
-
-        # Log images
-        if self.global_step % log_freq == 0:
-
-            # for tag, value in self.named_parameters():
-            #     self.logger.experiment.add_histogram("train/" + tag, value, self.global_step)
-
-            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
-            self.logger.experiment.add_image(tag="train/source_images", img_tensor=grid,
-                                             global_step=int(self.global_step / log_freq) % 5)
-
-            grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
-            self.logger.experiment.add_image(tag="train/target_images", img_tensor=grid,
-                                             global_step=int(self.global_step / log_freq) % 5)
-
-            grid = torchvision.utils.make_grid(fake_source_images, normalize=True, value_range=(-1, 1))
-            self.logger.experiment.add_image(tag="train/fake_source_images", img_tensor=grid,
-                                             global_step=int(self.global_step / log_freq) % 5)
-
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
+
+    def validation_step(self, batch):
+        source_images, target_images = batch
+
+        global_step = self.global_step
+        tensorboard = self.logger.experiment
+
+        target_images_adapted = self.generator(target_images)
+
+        grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=global_step)
+
+        grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=global_step)
+
+        grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=global_step)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

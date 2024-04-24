@@ -32,7 +32,7 @@ python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semanti
 ## Train domain adaptation models
 
 ```bash
-python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset// --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan
+python -u train.py --source_dir $HOME/data/potsdam-dataset/ --target_dir $HOME/data/vaihingen-dataset/ --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan
 ```
 
 ```bash

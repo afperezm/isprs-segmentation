@@ -54,19 +54,19 @@ class ColorMapGAN(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         source_images, target_images = batch
 
-        global_step = self.global_step
+        current_epoch = self.current_epoch
         tensorboard = self.logger.experiment
 
         target_images_adapted = self.generator(target_images)
 
         grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=global_step + batch_idx)
+        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
 
         grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=global_step + batch_idx)
+        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)
 
         grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=global_step + batch_idx)
+        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

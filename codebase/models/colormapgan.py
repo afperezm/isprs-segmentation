@@ -55,7 +55,10 @@ class ColorMapGAN(pl.LightningModule):
         source_images, target_images = batch
 
         current_epoch = self.current_epoch
+        global_step = self.global_step
         tensorboard = self.logger.experiment
+
+        print(f'current_epoch={current_epoch} global_step={global_step}')
 
         target_images_adapted = self.generator(target_images)
 

@@ -2,10 +2,10 @@ import torch
 from torch import nn
 
 
-class ColorGANGenerator(nn.Module):
+class ColorMapGenerator(nn.Module):
 
     def __init__(self):
-        super(ColorGANGenerator, self).__init__()
+        super(ColorMapGenerator, self).__init__()
 
         self.weight = nn.Parameter(torch.empty((256 * 256 * 256, 3)))
         self.bias = nn.Parameter(torch.empty((256 * 256 * 256, 3)))

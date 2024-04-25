@@ -51,22 +51,22 @@ class ColorMapGAN(pl.LightningModule):
 
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
-    def validation_step(self, batch):
+    def validation_step(self, batch, batch_idx):
         source_images, target_images = batch
 
-        current_epoch = self.current_epoch
+        global_step = self.global_step
         tensorboard = self.logger.experiment
 
         target_images_adapted = self.generator(target_images)
 
         grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
+        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=global_step + batch_idx)
 
         grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)
+        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=global_step + batch_idx)
 
         grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
+        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=global_step + batch_idx)
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

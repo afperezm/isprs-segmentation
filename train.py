@@ -42,7 +42,12 @@ def main():
         transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
     )
 
-    train_dataset, valid_dataset = random_split(train_dataset, [0.9, 0.1], generator=generator)
+    # Use four images for validation and the rest for training
+    valid_set_size = 4
+    train_set_size = len(train_dataset) - valid_set_size
+
+    # Split the training dataset in two
+    train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
 
     train_dataloader = DataLoader(
         train_dataset,

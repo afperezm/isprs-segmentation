@@ -4,7 +4,8 @@ import pytorch_lightning as pl
 import torch
 
 from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models.generative import ColorMapGAN, CycleGAN
+from codebase.models.colormapgan import ColorMapGAN
+from codebase.models.cyclegan import CycleGAN
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime

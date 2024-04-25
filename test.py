@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models.generative import CycleGAN
+from codebase.models.cyclegan import CycleGAN
 
 PARAMS = None
 

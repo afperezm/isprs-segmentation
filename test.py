@@ -34,6 +34,7 @@ def main():
         source_dir=source_dir,
         target_dir=target_dir,
         is_train=True,
+        include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
@@ -48,6 +49,7 @@ def main():
         source_dir=source_dir,
         target_dir=target_dir,
         is_train=False,
+        include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
@@ -70,9 +72,7 @@ def main():
     # Print prediction results
     for idx, result in enumerate(results):
 
-        image_a2b, image_b2a = result
-
-        image_a_name = test_dataset.images_a[idx % test_dataset.num_images_a]
+        image_a2b, image_a_name = result[0], result[2]
 
         print(image_a_name)
 
@@ -84,7 +84,7 @@ def main():
 
         _ = cv2.imwrite(os.path.join(output_dir, exp_name, image_a_name), image_a2b)
 
-        image_b_name = test_dataset.images_b[idx % test_dataset.num_images_b]
+        image_b2a, image_b_name = result[1], result[3]
 
         print(image_b_name)
 

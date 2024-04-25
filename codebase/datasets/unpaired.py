@@ -10,10 +10,11 @@ class UnpairedDataset(Dataset):
     train_phase = 'train'
     test_phase = 'test'
 
-    def __init__(self, source_dir, target_dir, is_train=True, transform=None):
+    def __init__(self, source_dir, target_dir, is_train=True, include_names=False, transform=None):
         self.source_dir = source_dir
         self.target_dir = target_dir
         self.is_train = is_train
+        self.include_names = include_names
         self.transform = transform
 
         if self.is_train:
@@ -33,8 +34,12 @@ class UnpairedDataset(Dataset):
         return self.num_images
 
     def __getitem__(self, index):
-        path_source = os.path.join(self.source_dir, self.phase, 'images', self.images_a[index % self.num_images_a])
-        path_target = os.path.join(self.target_dir, self.phase, 'images', self.images_b[index % self.num_images_b])
+
+        source_name = self.images_a[index % self.num_images_a]
+        target_name = self.images_b[index % self.num_images_b]
+
+        path_source = os.path.join(self.source_dir, self.phase, 'images', source_name)
+        path_target = os.path.join(self.target_dir, self.phase, 'images', target_name)
 
         img_source = cv2.imread(path_source)
         img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)
@@ -45,7 +50,10 @@ class UnpairedDataset(Dataset):
             img_source = self.transform(img_source)
             img_target = self.transform(img_target)
 
-        return img_source, img_target
+        if self.include_names:
+            return img_source, img_target, target_name, target_name
+        else:
+            return img_source, img_target
 
 
 if __name__ == "__main__":

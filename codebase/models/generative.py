@@ -208,7 +208,7 @@ class CycleGAN(pl.LightningModule):
         tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=global_step)
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
-        img_a, img_b = batch
+        img_a, img_b = batch[0], batch[1]
 
         img_a2b = self.gen_x(img_a)
         img_b2a = self.gen_y(img_b)
@@ -216,7 +216,10 @@ class CycleGAN(pl.LightningModule):
         img_a2b = img_a2b * 0.5 + 0.5
         img_b2a = img_b2a * 0.5 + 0.5
 
-        return img_a2b, img_b2a
+        if len(batch) == 4:
+            return img_a2b, img_b2a, batch[2], batch[3]
+        else:
+            return img_a2b, img_b2a
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

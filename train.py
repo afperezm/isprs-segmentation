@@ -8,7 +8,7 @@ from codebase.models.generative import ColorMapGAN, CycleGAN
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torchvision.transforms import Compose, ToTensor, Normalize
 
 
@@ -41,19 +41,14 @@ def main():
         transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
     )
 
+    train_dataset, valid_dataset = random_split(train_dataset, [0.9, 0.1], generator=generator)
+
     train_dataloader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=8,
         generator=generator
-    )
-
-    valid_dataset = UnpairedDataset(
-        source_dir=source_dir,
-        target_dir=target_dir,
-        is_train=False,
-        transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
     )
 
     valid_dataloader = DataLoader(

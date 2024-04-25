@@ -24,9 +24,9 @@ class PatchGANDiscriminator(nn.Module):
         super(PatchGANDiscriminator, self).__init__()
 
         self.model = nn.Sequential(
-            # nn.Conv2d(in_channels=num_channels, out_channels=num_features, kernel_size=4, stride=2, padding=1),
-            # nn.LeakyReLU(negative_slope=0.2, inplace=True),
-            ConvBlock(num_channels, num_features, False),
+            nn.Conv2d(in_channels=num_channels, out_channels=num_features, kernel_size=4, stride=2, padding=1),
+            nn.LeakyReLU(negative_slope=0.2, inplace=True),
+            # ConvBlock(num_channels, num_features, False),
             # ConvBlock(num_features, num_features * 2),
             # ConvBlock(num_features * 2, num_features * 4),
             # ConvBlock(num_features * 4, num_features * 8),

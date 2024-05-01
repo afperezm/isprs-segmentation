@@ -13,7 +13,10 @@ from sklearn.model_selection import train_test_split
 def rescale_image(image, scale):
     height, width = image.shape[0], image.shape[1]
 
-    image_rescaled = cv2.resize(image, (int(width * scale), int(height * scale)), interpolation=cv2.INTER_CUBIC)
+    if scale != 1.0:
+        image_rescaled = cv2.resize(image, (int(width * scale), int(height * scale)), interpolation=cv2.INTER_CUBIC)
+    else:
+        image_rescaled = image
 
     return image_rescaled
 

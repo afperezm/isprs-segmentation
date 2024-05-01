@@ -73,6 +73,6 @@ if __name__ == "__main__":
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
 
     for batch_idx, batch in enumerate(dataloader):
-        images, labels = batch['image'], batch['label']
+        images, labels = batch
 
         print(f"batch - {batch_idx} - ", images.shape, labels.shape)

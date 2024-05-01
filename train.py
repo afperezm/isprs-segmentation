@@ -107,6 +107,7 @@ def parse_args():
     parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
+    parser.add_argument("--comment", help="Experiment details", default="")
     return parser.parse_args()
 
 

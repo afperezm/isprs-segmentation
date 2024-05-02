@@ -2,26 +2,31 @@ import argparse
 import os
 import pytorch_lightning as pl
 import torch
+from torchvision import transforms
 
-from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models.colormapgan import ColorMapGAN
-from codebase.models.cyclegan import CycleGAN
+from codebase.datasets.isprs import ISPRSDataset
+# from codebase.datasets.unpaired import UnpairedDataset
+# from codebase.models.colormapgan import ColorMapGAN
+# from codebase.models.cyclegan import CycleGAN
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
-from torchvision.transforms import Compose, ToTensor, Normalize
+
+from codebase.models.segmentation import DeepLabV3
 
 
 def main():
-    source_dir = PARAMS.source_dir
-    target_dir = PARAMS.target_dir
+    data_dir = PARAMS.source_dir
+    # source_dir = PARAMS.source_dir
+    # target_dir = PARAMS.target_dir
     results_dir = PARAMS.results_dir
     epochs = PARAMS.epochs
     batch_size = PARAMS.batch_size
-    lr_gen = PARAMS.lr_gen
-    lr_dis = PARAMS.lr_dis
-    model = PARAMS.model
+    # lr_gen = PARAMS.lr_gen
+    # lr_dis = PARAMS.lr_dis
+    learning_rate = PARAMS.learning_rate
+    model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
     seed = PARAMS.seed
 
@@ -31,23 +36,47 @@ def main():
     results_dir_root = os.path.dirname(results_dir.rstrip('/'))
     results_dir_name = os.path.basename(results_dir.rstrip('/'))
 
-    exp_name = f"{model}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
+    exp_name = f"{model_name}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
 
     generator = torch.Generator().manual_seed(seed)
 
-    train_dataset = UnpairedDataset(
-        source_dir=source_dir,
-        target_dir=target_dir,
-        is_train=True,
-        transform=Compose([ToTensor(), Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+    # train_dataset = UnpairedDataset(
+    #     source_dir=source_dir,
+    #     target_dir=target_dir,
+    #     is_train=True
+    # )
+
+    train_dataset = ISPRSDataset(
+        data_dir=data_dir,
+        is_train=True
     )
 
-    # Use four images for validation and the rest for training
-    valid_set_size = 4
-    train_set_size = len(train_dataset) - valid_set_size
+    # # Use four images for validation and the rest for training
+    # valid_set_size = 4
+    # train_set_size = len(train_dataset) - valid_set_size
 
     # Split the training dataset in two
-    train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
+    # train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
+    train_dataset, valid_dataset = random_split(train_dataset, [0.8, 0.2], generator=generator)
+
+    # train_dataset.dataset.transform = transforms.Compose([
+    #     transforms.ToTensor(),
+    #     transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+    # ])
+
+    train_dataset.dataset.transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.RandomCrop((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+    ])
+
+    valid_dataset.dataset.transform = transforms.Compose([
+        transforms.RandomCrop((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+    ])
 
     train_dataloader = DataLoader(
         train_dataset,
@@ -70,17 +99,20 @@ def main():
                                default_hp_metric=False, sub_dir="logs")
 
     # Initialize callbacks
-    checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
+    # checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
+    checkpointing = ModelCheckpoint(monitor="train/loss", save_top_k=5, mode="min")
 
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
 
-    if model == "cyclegan":
-        gan_model = CycleGAN(lr_gen=lr_gen, lr_dis=lr_dis)
-    elif model == "colormapgan":
-        gan_model = ColorMapGAN(lr_gen=lr_gen, lr_dis=lr_dis)
-    else:
-        raise ValueError("Invalid model selection")
+    # if model_name == "cyclegan":
+    #     model = CycleGAN(lr_gen=lr_gen, lr_dis=lr_dis)
+    # elif model_name == "colormapgan":
+    #     model = ColorMapGAN(lr_gen=lr_gen, lr_dis=lr_dis)
+    # else:
+    #     raise ValueError("Invalid model selection")
+
+    model = DeepLabV3(num_classes=len(train_dataset.dataset.label_mapping), learning_rate=learning_rate)
 
     trainer = pl.Trainer(
         logger=logger,
@@ -90,21 +122,25 @@ def main():
         max_epochs=epochs,
         enable_progress_bar=enable_progress_bar
     )
-    trainer.fit(gan_model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
+    # trainer.fit(gan_model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
+    trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
 
 
 def parse_args():
     parser = argparse.ArgumentParser("Trainer for ColorMapGAN")
-    parser.add_argument("--source_dir", help="Source dataset directory", required=True)
-    parser.add_argument("--target_dir", help="Target dataset directory", required=True)
+    parser.add_argument("--data_dir", help="Source dataset directory", required=True)
+    # parser.add_argument("--source_dir", help="Source dataset directory", required=True)
+    # parser.add_argument("--target_dir", help="Target dataset directory", required=True)
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
-    parser.add_argument("--learning_rate_gen", help="Generator learning rate", dest="lr_gen", type=float,
-                        default=0.0002)
-    parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float,
-                        default=0.0002)
-    parser.add_argument("--model", help="Model name", choices=["cyclegan", "colormapgan"], default="colormapgan")
+    # parser.add_argument("--learning_rate_gen", help="Generator learning rate", dest="lr_gen", type=float,
+    #                     default=0.0002)
+    # parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float,
+    #                     default=0.0002)
+    parser.add_argument("--learning_rate", help="Learning rate", type=float, default=0.00005)
+    parser.add_argument("--model", help="Model name", dest="model_name",
+                        choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
     parser.add_argument("--comment", help="Experiment details", default="")

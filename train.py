@@ -17,7 +17,7 @@ from codebase.models.segmentation import DeepLabV3
 
 
 def main():
-    data_dir = PARAMS.source_dir
+    data_dir = PARAMS.data_dir
     # source_dir = PARAMS.source_dir
     # target_dir = PARAMS.target_dir
     results_dir = PARAMS.results_dir

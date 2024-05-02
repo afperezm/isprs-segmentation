@@ -13,7 +13,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
 
-from codebase.models.segmentation import DeepLabV3
+from codebase.models.deeplabv3 import DeepLabV3
 
 
 def main():

@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 import sys
+import torch
 
 from torch.utils.data import Dataset, DataLoader
 
@@ -11,14 +12,14 @@ class ISPRSDataset(Dataset):
     phase_train = 'train'
     phase_test = 'test'
 
-    label_mapping = {0: [255, 255, 255],  # Impervious surfaces
-                     1: [0, 0, 255],  # Building
-                     2: [0, 255, 255],  # Low vegetation
-                     3: [0, 255, 0],  # Tree
-                     4: [255, 255, 0],  # Car
-                     5: [255, 0, 0],  # Clutter Background
-                     6: [0, 0, 0]  # Boundary
-                     }
+    label_mapping = {
+        0: [1, 1, 1],  # Impervious surfaces
+        1: [0, 0, 1],  # Building
+        2: [0, 1, 1],  # Low vegetation
+        3: [0, 1, 0],  # Tree
+        4: [1, 1, 0],  # Car
+        5: [1, 0, 0],  # Clutter Background
+    }
 
     def __init__(self, data_dir, is_train=True, transform=None):
         super(ISPRSDataset).__init__()
@@ -40,10 +41,11 @@ class ISPRSDataset(Dataset):
     def __len__(self):
         return len(self.images_list)
 
-    def encode_label(self, label):
-        label_encoded = np.zeros(label.shape[0:2], dtype=np.uint8)
+    def encode_label(self, label_tensor):
+        label_encoded = torch.zeros((label_tensor.shape[1], label_tensor.shape[2]), dtype=torch.uint8)
         for index, color in self.label_mapping.items():
-            label_encoded[np.all(label == color, axis=-1)] = index
+            label_encoded[(label_tensor == torch.tensor(color).unsqueeze(dim=1).unsqueeze(dim=1)).all(dim=0)] = index
+        label_encoded = label_encoded.unsqueeze(dim=0)
         return label_encoded
 
     def __getitem__(self, index):
@@ -57,10 +59,13 @@ class ISPRSDataset(Dataset):
         label = cv2.imread(label_path)
         label = cv2.cvtColor(label, cv2.COLOR_BGR2RGB)
 
-        label = self.encode_label(label)
-
         if self.transform:
-            image, label = self.transform(image, label)
+            image_and_label = np.concatenate([image, label], axis=2)
+            image_and_label = self.transform(image_and_label)
+            image, label = image_and_label[0:3], image_and_label[3:]
+
+        # Encode labels assuming range was converted from 0..255 to 0..1
+        label = self.encode_label(label)
 
         return image, label
 

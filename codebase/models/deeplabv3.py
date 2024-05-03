@@ -27,6 +27,7 @@ class DeepLabV3(pl.LightningModule):
         images, masks = batch
 
         outputs = self.model(images)['out']
+        masks = masks.squeeze(dim=1).long()
 
         loss = self.criterion(outputs, masks)
         metric_iou = self.metric1(outputs, masks)

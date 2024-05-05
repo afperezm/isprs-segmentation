@@ -146,16 +146,13 @@ class CycleGAN(pl.LightningModule):
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         img_a, img_b = batch[0], batch[1]
 
-        img_a2b = self.gen_x(img_a)
-        img_a2b = img_a2b * 0.5 + 0.5
-
         img_b2a = self.gen_y(img_b)
-        img_b2a = img_b2a * 0.5 + 0.5
+        img_b2a = (img_b2a + 1.0) / 2.0
 
         if len(batch) == 4:
-            return img_a2b, img_b2a, batch[2], batch[3]
+            return img_b2a, batch[3]
         else:
-            return img_a2b, img_b2a
+            return img_b2a
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

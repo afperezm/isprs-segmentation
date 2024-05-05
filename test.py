@@ -72,19 +72,7 @@ def main():
     # Print prediction results
     for idx, result in enumerate(results):
 
-        image_a2b, image_a_name = result[0], result[2]
-
-        print(image_a_name)
-
-        image_a2b = np.transpose(image_a2b.cpu().detach().numpy().squeeze(), (1, 2, 0))
-        image_a2b = (255 * image_a2b).astype(np.uint8)
-        image_a2b = cv2.cvtColor(image_a2b, cv2.COLOR_RGB2BGR)
-
-        print(image_a2b.shape, np.min(image_a2b), np.max(image_a2b))
-
-        _ = cv2.imwrite(os.path.join(output_dir, exp_name, image_a_name), image_a2b)
-
-        image_b2a, image_b_name = result[1], result[3]
+        image_b2a, image_b_name = result[0], result[1]
 
         print(image_b_name)
 

@@ -22,12 +22,12 @@ This is the implementation of the core method of ColorMapGAN, containing a total
 https://www.isprs.org/education/benchmarks/UrbanSemLab/default.aspx
 
 ```bash
-python -u utils/dataset_split.py --images_dir $HOME/data/Potsdam/2_Ortho_RGB/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-rgb-dataset/ --patch_size 256 --stride 256 --scale 1.0 --seed 42 --crop
-python -u utils/dataset_split.py --images_dir $HOME/data/Potsdam/3_Ortho_IRRG/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-irrg-dataset/ --patch_size 256 --stride 256 --scale 1.0 --seed 42 --crop
+python -u utils/dataset_split.py --images_dir $HOME/data/Potsdam/2_Ortho_RGB/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-rgb-dataset/ --patch_size 256 --stride 256 --seed 42 --crop
+python -u utils/dataset_split.py --images_dir $HOME/data/Potsdam/3_Ortho_IRRG/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-irrg-dataset/ --patch_size 256 --stride 256 --seed 42 --crop
 ```
 
 ```bash
-python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-irrg-dataset/ --patch_size 256 --stride 256 --scale 1.0 --seed 42 --crop
+python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-irrg-dataset/ --patch_size 256 --stride 256 --seed 42 --crop
 ```
 
 ## Train domain adaptation models

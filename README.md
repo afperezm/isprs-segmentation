@@ -33,16 +33,16 @@ python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semanti
 ## Train domain adaptation models
 
 ```bash
-python -u train.py --source_dir $HOME/data/potsdam-rgb-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan --comment "Potsdam RGB to Vaihingen IRRG"
-python -u train.py --source_dir $HOME/data/vaihingen-irrg-dataset/ --target_dir $HOME/data/potsdam-rgb-dataset/ --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan --comment "Vaihingen IRRG to Potsdam RGB"
-python -u train.py --source_dir $HOME/data/potsdam-irrg-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan --comment "Potsdam IRRG to vaihingen IRRG"
-python -u train.py --source_dir $HOME/data/vaihingen-irrg-dataset/ --target_dir $HOME/data/potsdam-irrg-dataset/ --epochs 50 --batch_size 1 --learning_rate_gen 0.00001 --learning_rate_dis 0.00001 --model cyclegan --comment "vaihingen IRRG to Potsdam IRRG"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Vaihingen IRRG to Potsdam RGB"
+python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Potsdam IRRG to vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "vaihingen IRRG to Potsdam IRRG"
 ```
 
 ```bash
-python -u train.py --source_dir $HOME/data/potsdam-rgb-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.0005 --learning_rate_dis 0.0001 --model colormapgan-potsdam-rgb-to-vaihingen-irrg
-python -u train.py --source_dir $HOME/data/potsdam-rgb-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.001 --learning_rate_dis 0.0001 --model colormapgan-potsdam-rgb-to-vaihingen-irrg
-python -u train.py --source_dir $HOME/data/potsdam-rgb-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --epochs 5 --batch_size 1 --learning_rate_gen 0.0001 --learning_rate_dis 0.00001 --model colormapgan-potsdam-rgb-to-vaihingen-irrg
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0005 0.0001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.001 0.0001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
 ```
 
 ## Test domain adaptation models

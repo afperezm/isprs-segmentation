@@ -5,7 +5,7 @@ import torch
 from torchvision import transforms
 
 from codebase.datasets.isprs import ISPRSDataset
-# from codebase.datasets.unpaired import UnpairedDataset
+from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models.colormapgan import ColorMapGAN
 from codebase.models.cyclegan import CycleGAN
 from codebase.models.deeplabv3 import DeepLabV3
@@ -21,6 +21,7 @@ def main():
     epochs = PARAMS.epochs
     batch_size = PARAMS.batch_size
     learning_rate = PARAMS.learning_rate
+    dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
     seed = PARAMS.seed
@@ -35,43 +36,49 @@ def main():
 
     generator = torch.Generator().manual_seed(seed)
 
-    # train_dataset = UnpairedDataset(
-    #     source_dir=source_dir,
-    #     target_dir=target_dir,
-    #     is_train=True
-    # )
+    if dataset_name == "unpaired":
+        train_dataset = UnpairedDataset(
+            source_dir=data_dir[0],
+            target_dir=data_dir[1],
+            is_train=True
+        )
+        # Use four images for validation and the rest for training
+        valid_set_size = 4
+        train_set_size = len(train_dataset) - valid_set_size
+    elif dataset_name == "isprs":
+        train_dataset = ISPRSDataset(
+            data_dir=data_dir,
+            is_train=True
+        )
+        valid_set_size = 0.2
+        train_set_size = 1.0 - valid_set_size
+    else:
+        raise ValueError("Invalid dataset selection")
 
-    train_dataset = ISPRSDataset(
-        data_dir=data_dir,
-        is_train=True
-    )
+    # Split training dataset
+    train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
 
-    # # Use four images for validation and the rest for training
-    # valid_set_size = 4
-    # train_set_size = len(train_dataset) - valid_set_size
+    if dataset_name == "unpaired":
+        train_dataset.dataset.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+        ])
+    elif dataset_name == "isprs":
+        train_dataset.dataset.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomCrop((224, 224)),
+            transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+        ])
 
-    # Split the training dataset in two
-    # train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
-    train_dataset, valid_dataset = random_split(train_dataset, [0.8, 0.2], generator=generator)
-
-    # train_dataset.dataset.transform = transforms.Compose([
-    #     transforms.ToTensor(),
-    #     transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-    # ])
-
-    train_dataset.dataset.transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
-        transforms.RandomCrop((224, 224)),
-        transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
-    ])
-
-    valid_dataset.dataset.transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.RandomCrop((224, 224)),
-        transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
-    ])
+        valid_dataset.dataset.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.RandomCrop((224, 224)),
+            transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+        ])
+    else:
+        raise ValueError("Invalid dataset selection")
 
     train_dataloader = DataLoader(
         train_dataset,
@@ -94,8 +101,12 @@ def main():
                                default_hp_metric=False, sub_dir="logs")
 
     # Initialize callbacks
-    # checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
-    checkpointing = ModelCheckpoint(monitor="train/loss", save_top_k=5, mode="min")
+    if model_name == "cyclegan" or model_name == "colormapgan":
+        checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
+    elif model_name == "deeplabv3":
+        checkpointing = ModelCheckpoint(monitor="train/loss", save_top_k=5, mode="min")
+    else:
+        raise ValueError("Invalid model selection")
 
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
@@ -122,13 +133,12 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser("Trainer for ColorMapGAN")
-    parser.add_argument("--data_dir", help="Source dataset directory", required=True)
-    # parser.add_argument("--source_dir", help="Source dataset directory", required=True)
-    # parser.add_argument("--target_dir", help="Target dataset directory", required=True)
+    parser.add_argument("--data_dir", help="Source dataset directory", nargs="+", required=True)
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
     parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=0.0002)
+    parser.add_argument("--dataset", "Dataset name", dest="dataset_name", choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")

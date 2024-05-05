@@ -51,7 +51,7 @@ class UnpairedDataset(Dataset):
             img_target = self.transform(img_target)
 
         if self.include_names:
-            return img_source, img_target, target_name, target_name
+            return img_source, img_target, source_name, target_name
         else:
             return img_source, img_target
 

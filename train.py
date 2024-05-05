@@ -113,7 +113,7 @@ def main():
     elif model_name == "colormapgan":
         model = ColorMapGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
     elif model_name == "deeplabv3":
-        model = DeepLabV3(num_classes=len(train_dataset.dataset.label_mapping), learning_rate=learning_rate)
+        model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, learning_rate=learning_rate)
     else:
         raise ValueError("Invalid model selection")
 

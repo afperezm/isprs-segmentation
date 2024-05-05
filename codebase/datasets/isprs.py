@@ -41,6 +41,10 @@ class ISPRSDataset(Dataset):
     def __len__(self):
         return len(self.images_list)
 
+    @property
+    def num_classes(self):
+        return len(self.label_mapping)
+
     def encode_label(self, label_tensor):
         label_encoded = torch.zeros((label_tensor.shape[1], label_tensor.shape[2]), dtype=torch.uint8)
         for index, color in self.label_mapping.items():

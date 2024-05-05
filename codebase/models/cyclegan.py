@@ -17,7 +17,7 @@ class CycleGAN(pl.LightningModule):
     def __init__(self, lr_gen=0.0002, lr_dis=0.0002, lambda_cycle=10.0, lambda_identity=0.0):
         super(CycleGAN, self).__init__()
 
-        self.save_hyperparameters()
+        self.save_hyperparameters(logger=False)
         self.automatic_optimization = False
 
         # generator pair

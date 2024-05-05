@@ -10,7 +10,7 @@ class DeepLabV3(pl.LightningModule):
     def __init__(self, num_classes, learning_rate=0.00005, weight_decay=0.001):
         super(DeepLabV3, self).__init__()
 
-        self.save_hyperparameters()
+        self.save_hyperparameters(logger=False)
 
         self.model = torchvision.models.segmentation.deeplabv3_resnet50(weights=DeepLabV3_ResNet50_Weights.DEFAULT)
         self.model.aux_classifier = None

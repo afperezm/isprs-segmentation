@@ -147,9 +147,9 @@ class CycleGAN(pl.LightningModule):
         img_a, img_b = batch[0], batch[1]
 
         img_a2b = self.gen_x(img_a)
-        img_b2a = self.gen_y(img_b)
-
         img_a2b = img_a2b * 0.5 + 0.5
+
+        img_b2a = self.gen_y(img_b)
         img_b2a = img_b2a * 0.5 + 0.5
 
         if len(batch) == 4:

@@ -9,30 +9,30 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from codebase.datasets.unpaired import UnpairedDataset
+from codebase.models import ColorMapGAN
 from codebase.models.cyclegan import CycleGAN
 
 PARAMS = None
 
 
 def main():
-    source_dir = PARAMS.source_dir
-    target_dir = PARAMS.target_dir
+    data_dir = PARAMS.data_dir
     output_dir = PARAMS.output_dir
-    checkpoints_dir = PARAMS.checkpoints_dir
-    model = PARAMS.model
+    ckpt_path = PARAMS.ckpt_path
+    model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
     # test_only = PARAMS.test_only
     # predict_only = PARAMS.predict_only
 
-    exp_name = os.path.normpath(checkpoints_dir).split(os.sep)[-2]
+    exp_name = os.path.normpath(ckpt_path).split(os.sep)[-3]
 
     # Create output directory
     if not os.path.exists(os.path.join(output_dir, exp_name)):
         os.makedirs(os.path.join(output_dir, exp_name))
 
     train_dataset = UnpairedDataset(
-        source_dir=source_dir,
-        target_dir=target_dir,
+        source_dir=data_dir[0],
+        target_dir=data_dir[0],
         is_train=True,
         include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
@@ -46,8 +46,8 @@ def main():
     )
 
     test_dataset = UnpairedDataset(
-        source_dir=source_dir,
-        target_dir=target_dir,
+        source_dir=data_dir[0],
+        target_dir=data_dir[0],
         is_train=False,
         include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
@@ -60,14 +60,19 @@ def main():
         num_workers=8
     )
 
-    gan_model = CycleGAN.load_from_checkpoint(f'{checkpoints_dir}/{model}')
+    if model_name == "cyclegan":
+        model = CycleGAN.load_from_checkpoint(ckpt_path)
+    elif model_name == "colormapgan":
+        model = ColorMapGAN.load_from_checkpoint(ckpt_path)
+    else:
+        raise ValueError("Invalid model selection")
 
     # Initialize trainer
     trainer = pl.Trainer(logger=False, enable_progress_bar=enable_progress_bar, accelerator="auto", devices=1,
                          enable_model_summary=False)
 
     # Perform prediction
-    results = trainer.predict(model=gan_model, dataloaders=[train_dataloader, test_dataloader])
+    results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
 
     # Print prediction results
     for idx, result in enumerate(results):
@@ -87,11 +92,11 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--source_dir", help="Source dataset directory", required=True)
-    parser.add_argument("--target_dir", help="Target dataset directory", required=True)
+    parser.add_argument("--data_dir", help="Source dataset directory", nargs="+", required=True)
     parser.add_argument("--output_dir", help="Output directory")
-    parser.add_argument("--checkpoints_dir", help="Checkpoints directory", required=True)
-    parser.add_argument("--model", help="Model name", required=True)
+    parser.add_argument("--ckpt_path", help="Checkpoint path", required=True)
+    parser.add_argument("--model", help="Model name", dest="model_name", choices=["cyclegan", "colormapgan"],
+                        required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     # parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")
     # parser.add_argument("--predict_only", help="Flag to disable test phase and predict only", action="store_true")

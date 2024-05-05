@@ -1,0 +1,3 @@
+from codebase.networks.colormapgenerator import ColorMapGenerator
+from codebase.networks.patchdiscriminator import PatchDiscriminator
+from codebase.networks.resnetgenerator import ResNetGenerator

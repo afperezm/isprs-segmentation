@@ -9,8 +9,7 @@ import random
 import torch
 import torchvision
 
-from codebase.networks.discriminator import PatchGANDiscriminator
-from codebase.networks.generator import ResNetGenerator
+from codebase.networks import ResNetGenerator, PatchDiscriminator
 from itertools import chain
 
 
@@ -26,8 +25,8 @@ class CycleGAN(pl.LightningModule):
         self.gen_y = ResNetGenerator()
 
         # discriminator pair
-        self.dis_x = PatchGANDiscriminator(num_channels=3, num_features=64)
-        self.dis_y = PatchGANDiscriminator(num_channels=3, num_features=64)
+        self.dis_x = PatchDiscriminator(num_channels=3, num_features=64)
+        self.dis_y = PatchDiscriminator(num_channels=3, num_features=64)
 
         self.fake_a = None
         self.fake_b = None

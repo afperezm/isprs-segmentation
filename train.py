@@ -4,11 +4,8 @@ import pytorch_lightning as pl
 import torch
 from torchvision import transforms
 
-from codebase.datasets.isprs import ISPRSDataset
-from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models.colormapgan import ColorMapGAN
-from codebase.models.cyclegan import CycleGAN
-from codebase.models.deeplabv3 import DeepLabV3
+from codebase.datasets import ISPRSDataset, UnpairedDataset
+from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime

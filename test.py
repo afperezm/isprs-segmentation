@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import pytorch_lightning as pl
 
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from torchvision import transforms
 
 from codebase.datasets.unpaired import UnpairedDataset
@@ -38,13 +38,6 @@ def main():
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=1,
-        shuffle=False,
-        num_workers=8
-    )
-
     test_dataset = UnpairedDataset(
         source_dir=data_dir[0],
         target_dir=data_dir[0],
@@ -53,8 +46,10 @@ def main():
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
-    test_dataloader = DataLoader(
-        test_dataset,
+    train_test_dataset = ConcatDataset([train_dataset, test_dataset])
+
+    train_test_dataloader = DataLoader(
+        train_test_dataset,
         batch_size=1,
         shuffle=False,
         num_workers=8
@@ -72,12 +67,12 @@ def main():
                          enable_model_summary=False)
 
     # Perform prediction
-    results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
+    results = trainer.predict(model=model, dataloaders=[train_test_dataloader])
 
     # Print prediction results
     for idx, result in enumerate(results):
 
-        image_b2a, image_b_name = result[0], result[1][0]
+        image_b2a, image_b_name = result[0], result[1]
 
         print(image_b_name)
 

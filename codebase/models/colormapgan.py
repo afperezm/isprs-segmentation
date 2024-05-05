@@ -70,6 +70,17 @@ class ColorMapGAN(pl.LightningModule):
         grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
         tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
 
+    def predict_step(self, batch):
+        source_images, target_images = batch[0], batch[1]
+
+        target_images_adapted = self.generator(target_images)
+        target_images_adapted = (target_images_adapted + 1.0) / 2.0
+
+        if len(batch) == 4:
+            return target_images_adapted, batch[3]
+        else:
+            return target_images_adapted
+
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen
         lr_dis = self.hparams.lr_dis

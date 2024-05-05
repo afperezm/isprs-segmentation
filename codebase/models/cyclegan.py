@@ -123,7 +123,10 @@ class CycleGAN(pl.LightningModule):
         img_a, img_b = batch
 
         current_epoch = self.current_epoch
+        global_step = self.global_step
         tensorboard = self.logger.experiment
+
+        print(f'current_epoch={current_epoch} global_step={global_step}')
 
         fake_b = self.gen_x(img_a)
         fake_a = self.gen_y(img_b)

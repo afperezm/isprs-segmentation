@@ -6,25 +6,20 @@ from torchvision import transforms
 
 from codebase.datasets.isprs import ISPRSDataset
 # from codebase.datasets.unpaired import UnpairedDataset
-# from codebase.models.colormapgan import ColorMapGAN
-# from codebase.models.cyclegan import CycleGAN
+from codebase.models.colormapgan import ColorMapGAN
+from codebase.models.cyclegan import CycleGAN
+from codebase.models.deeplabv3 import DeepLabV3
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
 
-from codebase.models.deeplabv3 import DeepLabV3
-
 
 def main():
     data_dir = PARAMS.data_dir
-    # source_dir = PARAMS.source_dir
-    # target_dir = PARAMS.target_dir
     results_dir = PARAMS.results_dir
     epochs = PARAMS.epochs
     batch_size = PARAMS.batch_size
-    # lr_gen = PARAMS.lr_gen
-    # lr_dis = PARAMS.lr_dis
     learning_rate = PARAMS.learning_rate
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
@@ -105,14 +100,14 @@ def main():
     # Dump program arguments
     logger.log_hyperparams(params=PARAMS)
 
-    # if model_name == "cyclegan":
-    #     model = CycleGAN(lr_gen=lr_gen, lr_dis=lr_dis)
-    # elif model_name == "colormapgan":
-    #     model = ColorMapGAN(lr_gen=lr_gen, lr_dis=lr_dis)
-    # else:
-    #     raise ValueError("Invalid model selection")
-
-    model = DeepLabV3(num_classes=len(train_dataset.dataset.label_mapping), learning_rate=learning_rate)
+    if model_name == "cyclegan":
+        model = CycleGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
+    elif model_name == "colormapgan":
+        model = ColorMapGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
+    elif model_name == "deeplabv3":
+        model = DeepLabV3(num_classes=len(train_dataset.dataset.label_mapping), learning_rate=learning_rate)
+    else:
+        raise ValueError("Invalid model selection")
 
     trainer = pl.Trainer(
         logger=logger,
@@ -122,7 +117,6 @@ def main():
         max_epochs=epochs,
         enable_progress_bar=enable_progress_bar
     )
-    # trainer.fit(gan_model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
     trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
 
 
@@ -134,11 +128,7 @@ def parse_args():
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
-    # parser.add_argument("--learning_rate_gen", help="Generator learning rate", dest="lr_gen", type=float,
-    #                     default=0.0002)
-    # parser.add_argument("--learning_rate_dis", help="Generator learning rate", dest="lr_dis", type=float,
-    #                     default=0.0002)
-    parser.add_argument("--learning_rate", help="Learning rate", type=float, default=0.00005)
+    parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=0.0002)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")

@@ -72,7 +72,7 @@ def main():
     # Print prediction results
     for idx, result in enumerate(results):
 
-        image_b2a, image_b_name = result[0], result[1]
+        image_b2a, image_b_name = result[0], result[1][0]
 
         print(image_b_name)
 

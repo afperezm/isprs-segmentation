@@ -44,7 +44,7 @@ def main():
         train_set_size = len(train_dataset) - valid_set_size
     elif dataset_name == "isprs":
         train_dataset = ISPRSDataset(
-            data_dir=data_dir,
+            data_dir=data_dir[0],
             is_train=True
         )
         valid_set_size = 0.2

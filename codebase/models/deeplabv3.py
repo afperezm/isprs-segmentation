@@ -18,10 +18,10 @@ class DeepLabV3(pl.LightningModule):
             param.requires_grad = False
         self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
-        self.criterion = nn.CrossEntropyLoss(ignore_index=0)
-        self.metric1 = MulticlassJaccardIndex(num_classes, ignore_index=0)
-        self.metric2 = MulticlassPrecision(num_classes, ignore_index=0)
-        self.metric3 = MulticlassRecall(num_classes, ignore_index=0)
+        self.criterion = nn.CrossEntropyLoss()
+        self.metric1 = MulticlassJaccardIndex(num_classes)
+        self.metric2 = MulticlassPrecision(num_classes)
+        self.metric3 = MulticlassRecall(num_classes)
 
     def shared_step(self, batch):
         images, masks = batch

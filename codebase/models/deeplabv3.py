@@ -58,7 +58,7 @@ class DeepLabV3(pl.LightningModule):
 
         return loss
 
-    def test_step(self, batch):
+    def test_step(self, batch, batch_idx, dataloader_idx=0):
         loss, metrics = self.shared_step(batch)
 
         self.log("test/loss", loss, on_step=False, on_epoch=True)

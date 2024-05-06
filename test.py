@@ -8,8 +8,9 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+from codebase.datasets import ISPRSDataset
 from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models import ColorMapGAN
+from codebase.models import ColorMapGAN, DeepLabV3
 from codebase.models.cyclegan import CycleGAN
 
 PARAMS = None
@@ -19,6 +20,7 @@ def main():
     data_dir = PARAMS.data_dir
     output_dir = PARAMS.output_dir
     ckpt_path = PARAMS.ckpt_path
+    dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
     test_only = PARAMS.test_only
@@ -30,21 +32,42 @@ def main():
     os.makedirs(os.path.join(output_dir, exp_name, "train", "images"))
     os.makedirs(os.path.join(output_dir, exp_name, "test", "images"))
 
-    train_dataset = UnpairedDataset(
-        source_dir=data_dir[0],
-        target_dir=data_dir[1],
-        is_train=True,
-        include_names=True,
-        transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
-    )
+    if dataset_name == "unpaired":
+        train_dataset = UnpairedDataset(
+            source_dir=data_dir[0],
+            target_dir=data_dir[1],
+            is_train=True,
+            include_names=True,
+            transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
+        )
 
-    test_dataset = UnpairedDataset(
-        source_dir=data_dir[0],
-        target_dir=data_dir[1],
-        is_train=False,
-        include_names=True,
-        transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
-    )
+        test_dataset = UnpairedDataset(
+            source_dir=data_dir[0],
+            target_dir=data_dir[1],
+            is_train=False,
+            include_names=True,
+            transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
+        )
+    elif dataset_name == "isprs":
+        train_dataset = ISPRSDataset(
+            data_dir=data_dir,
+            is_train=True,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+            ])
+        )
+
+        test_dataset = ISPRSDataset(
+            data_dir=data_dir,
+            is_train=False,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+            ])
+        )
+    else:
+        raise ValueError("Invalid dataset selection")
 
     train_dataloader = DataLoader(
         train_dataset,
@@ -64,6 +87,8 @@ def main():
         model = CycleGAN.load_from_checkpoint(ckpt_path)
     elif model_name == "colormapgan":
         model = ColorMapGAN.load_from_checkpoint(ckpt_path)
+    elif model_name == "deeplabv3":
+        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.num_classes)
     else:
         raise ValueError("Invalid model selection")
 
@@ -112,8 +137,10 @@ def parse_args():
     parser.add_argument("--data_dir", help="Source dataset directory", nargs="+", required=True)
     parser.add_argument("--output_dir", help="Output directory")
     parser.add_argument("--ckpt_path", help="Checkpoint path", required=True)
-    parser.add_argument("--model", help="Model name", dest="model_name", choices=["cyclegan", "colormapgan"],
-                        required=True)
+    parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
+                        choices=["unpaired", "isprs"], required=True)
+    parser.add_argument("--model", help="Model name", dest="model_name",
+                        choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")
     parser.add_argument("--predict_only", help="Flag to disable test phase and predict only", action="store_true")

@@ -21,8 +21,8 @@ def main():
     ckpt_path = PARAMS.ckpt_path
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
-    # test_only = PARAMS.test_only
-    # predict_only = PARAMS.predict_only
+    test_only = PARAMS.test_only
+    predict_only = PARAMS.predict_only
 
     exp_name = os.path.normpath(ckpt_path).split(os.sep)[-3]
 
@@ -71,32 +71,40 @@ def main():
     trainer = pl.Trainer(logger=False, enable_progress_bar=enable_progress_bar, accelerator="auto", devices=1,
                          enable_model_summary=False)
 
-    # Perform prediction
-    results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
+    if not predict_only:
+        # Perform evaluation
+        results = trainer.test(model=model, dataloaders=[train_dataloader, test_dataloader])
 
-    assert len(results) == 2
+        # Print evaluation results
+        print(results)
 
-    # Save predictions
-    for split_idx, split_results in enumerate(results):
+    if not test_only:
+        # Perform prediction
+        results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
 
-        if split_idx == 0:
-            split_name = "train"
-        else:
-            split_name = "test"
+        assert len(results) == 2
 
-        for idx, result in enumerate(split_results):
+        # Save predictions
+        for split_idx, split_results in enumerate(results):
 
-            image_b2a, image_b_name = result[0], result[1][0]
+            if split_idx == 0:
+                split_name = "train"
+            else:
+                split_name = "test"
 
-            print(image_b_name)
+            for idx, result in enumerate(split_results):
 
-            image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
-            image_b2a = (255 * image_b2a).astype(np.uint8)
-            image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
+                image_b2a, image_b_name = result[0], result[1][0]
 
-            print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
+                print(image_b_name)
 
-            _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_b_name), image_b2a)
+                image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
+                image_b2a = (255 * image_b2a).astype(np.uint8)
+                image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
+
+                print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
+
+                _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_b_name), image_b2a)
 
 
 def parse_args():
@@ -107,8 +115,8 @@ def parse_args():
     parser.add_argument("--model", help="Model name", dest="model_name", choices=["cyclegan", "colormapgan"],
                         required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
-    # parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")
-    # parser.add_argument("--predict_only", help="Flag to disable test phase and predict only", action="store_true")
+    parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")
+    parser.add_argument("--predict_only", help="Flag to disable test phase and predict only", action="store_true")
     return parser.parse_args()
 
 

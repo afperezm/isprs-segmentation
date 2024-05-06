@@ -32,7 +32,7 @@ def main():
 
     train_dataset = UnpairedDataset(
         source_dir=data_dir[0],
-        target_dir=data_dir[0],
+        target_dir=data_dir[1],
         is_train=True,
         include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
@@ -40,7 +40,7 @@ def main():
 
     test_dataset = UnpairedDataset(
         source_dir=data_dir[0],
-        target_dir=data_dir[0],
+        target_dir=data_dir[1],
         is_train=False,
         include_names=True,
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])

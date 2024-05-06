@@ -33,20 +33,31 @@ python -u utils/dataset_split.py --images_dir $HOME/data/Vaihingen/ISPRS_semanti
 ## Train domain adaptation models
 
 ```bash
-python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Potsdam RGB to Vaihingen IRRG"
-python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Vaihingen IRRG to Potsdam RGB"
-python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "Potsdam IRRG to vaihingen IRRG"
-python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results_cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --model cyclegan --comment "vaihingen IRRG to Potsdam IRRG"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --dataset unpaired --model cyclegan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --results_dir ./results/cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --dataset unpaired --model cyclegan --comment "Vaihingen IRRG to Potsdam RGB"
+python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --dataset unpaired --model cyclegan --comment "Potsdam IRRG to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results/cyclegan/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --dataset unpaired --model cyclegan --comment "Vaihingen IRRG to Potsdam IRRG"
 ```
 
 ```bash
-python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0005 0.0001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
-python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.001 0.0001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
-python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results_colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam RGB"
+python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Potsdam IRRG to Vaihingen IRRG"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam IRRG"
 ```
 
 ## Test domain adaptation models
 
 ```bash
-python -u test.py --source_dir $HOME/data/potsdam-rgb-dataset/ --target_dir $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --checkpoints_dir ./results/cyclegan-240417-202255/checkpoints/ --model epoch=4-step=158700.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033802/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033914/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033956/checkpoints/epoch=19-step=634640.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-034122/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar
+```
+
+```bash
+python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043518/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043720/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043759/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043836/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar
 ```

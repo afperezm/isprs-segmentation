@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import pytorch_lightning as pl
 
-from torch.utils.data import DataLoader, ConcatDataset
+from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from codebase.datasets.unpaired import UnpairedDataset
@@ -46,10 +46,15 @@ def main():
         transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
     )
 
-    train_test_dataset = ConcatDataset([train_dataset, test_dataset])
+    train_dataloader = DataLoader(
+        train_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=8
+    )
 
-    train_test_dataloader = DataLoader(
-        train_test_dataset,
+    test_dataloader = DataLoader(
+        test_dataset,
         batch_size=1,
         shuffle=False,
         num_workers=8
@@ -67,22 +72,31 @@ def main():
                          enable_model_summary=False)
 
     # Perform prediction
-    results = trainer.predict(model=model, dataloaders=[train_test_dataloader])
+    results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
 
-    # Print prediction results
-    for idx, result in enumerate(results):
+    assert len(results) == 2
 
-        image_b2a, image_b_name = result[0], result[1][0]
+    # Save predictions
+    for split_idx, split_results in enumerate(results):
 
-        print(image_b_name)
+        if split_idx == 0:
+            split_name = "train"
+        else:
+            split_name = "test"
 
-        image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
-        image_b2a = (255 * image_b2a).astype(np.uint8)
-        image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
+        for idx, result in enumerate(split_results):
 
-        print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
+            image_b2a, image_b_name = result[0], result[1][0]
 
-        _ = cv2.imwrite(os.path.join(output_dir, exp_name, image_b_name), image_b2a)
+            print(image_b_name)
+
+            image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
+            image_b2a = (255 * image_b2a).astype(np.uint8)
+            image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
+
+            print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
+
+            _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_b_name), image_b2a)
 
 
 def parse_args():

@@ -50,7 +50,7 @@ def main():
         )
     elif dataset_name == "isprs":
         train_dataset = ISPRSDataset(
-            data_dir=data_dir,
+            data_dir=data_dir[0],
             is_train=True,
             transform=transforms.Compose([
                 transforms.ToTensor(),
@@ -59,7 +59,7 @@ def main():
         )
 
         test_dataset = ISPRSDataset(
-            data_dir=data_dir,
+            data_dir=data_dir[0],
             is_train=False,
             transform=transforms.Compose([
                 transforms.ToTensor(),

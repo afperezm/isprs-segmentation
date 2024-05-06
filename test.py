@@ -26,9 +26,9 @@ def main():
 
     exp_name = os.path.normpath(ckpt_path).split(os.sep)[-3]
 
-    # Create output directory
-    if not os.path.exists(os.path.join(output_dir, exp_name)):
-        os.makedirs(os.path.join(output_dir, exp_name))
+    # Create output directories
+    os.makedirs(os.path.join(output_dir, exp_name, "train", "images"))
+    os.makedirs(os.path.join(output_dir, exp_name, "test", "images"))
 
     train_dataset = UnpairedDataset(
         source_dir=data_dir[0],

@@ -117,6 +117,7 @@ def main():
     else:
         raise ValueError("Invalid model selection")
 
+    # Initialize trainer
     trainer = pl.Trainer(
         logger=logger,
         callbacks=[lr_monitor, checkpointing],
@@ -125,6 +126,8 @@ def main():
         max_epochs=epochs,
         enable_progress_bar=enable_progress_bar
     )
+
+    # Perform training
     trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
 
 

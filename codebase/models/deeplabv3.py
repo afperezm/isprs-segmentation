@@ -14,8 +14,6 @@ class DeepLabV3(pl.LightningModule):
 
         self.model = torchvision.models.segmentation.deeplabv3_resnet50(weights=DeepLabV3_ResNet50_Weights.DEFAULT)
         self.model.aux_classifier = None
-        for param in self.model.parameters():
-            param.requires_grad = False
         self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
         self.criterion = nn.CrossEntropyLoss()

@@ -49,15 +49,15 @@ python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/pots
 ## Test domain adaptation models
 
 ```bash
-python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033802/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033914/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-033956/checkpoints/epoch=19-step=634640.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model cyclegan --ckpt_path ./results/cyclegan/cyclegan-240501-034122/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --dataset unpaired --ckpt_path ./results/cyclegan/cyclegan-240501-033802/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model cyclegan --dataset unpaired --ckpt_path ./results/cyclegan/cyclegan-240501-033914/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model cyclegan --dataset unpaired --ckpt_path ./results/cyclegan/cyclegan-240501-033956/checkpoints/epoch=19-step=634640.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model cyclegan --dataset unpaired --ckpt_path ./results/cyclegan/cyclegan-240501-034122/checkpoints/epoch=20-step=666372.ckpt --enable_progress_bar --predict_only
 ```
 
 ```bash
-python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043518/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043720/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043759/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
-python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model colormapgan --ckpt_path ./results/colormapgan/colormapgan-240505-043836/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --dataset unpaired --ckpt_path ./results/colormapgan/colormapgan-240505-043518/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --output_dir ./submits/ --model colormapgan --dataset unpaired --ckpt_path ./results/colormapgan/colormapgan-240505-043720/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --output_dir ./submits/ --model colormapgan --dataset unpaired --ckpt_path ./results/colormapgan/colormapgan-240505-043759/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
+python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model colormapgan --dataset unpaired --ckpt_path ./results/colormapgan/colormapgan-240505-043836/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
 ```

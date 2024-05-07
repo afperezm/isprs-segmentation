@@ -28,9 +28,10 @@ def main():
 
     exp_name = os.path.normpath(ckpt_path).split(os.sep)[-3]
 
-    # Create output directories
-    os.makedirs(os.path.join(output_dir, exp_name, "train", "images"), exist_ok=True)
-    os.makedirs(os.path.join(output_dir, exp_name, "test", "images"), exist_ok=True)
+    # Create output directories (only in prediction mode)
+    if not test_only:
+        os.makedirs(os.path.join(output_dir, exp_name, "train", "images"), exist_ok=True)
+        os.makedirs(os.path.join(output_dir, exp_name, "test", "images"), exist_ok=True)
 
     if dataset_name == "unpaired":
         train_dataset = UnpairedDataset(

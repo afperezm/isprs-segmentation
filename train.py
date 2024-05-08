@@ -98,7 +98,7 @@ def main():
                                default_hp_metric=False, sub_dir="logs")
 
     # Initialize callbacks
-    early_stopping = EarlyStopping(monitor="train/loss", min_delta=0.0, patience=3)
+    early_stopping = EarlyStopping(monitor="train/loss", min_delta=0.0, patience=3, verbose=True)
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     if model_name == "cyclegan" or model_name == "colormapgan":
         checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")

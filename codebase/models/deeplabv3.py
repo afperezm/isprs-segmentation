@@ -83,6 +83,6 @@ class DeepLabV3(pl.LightningModule):
         optimizer = optim.Adam(parameters, lr=learning_rate, weight_decay=weight_decay)
 
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, patience=7,
-                                                         threshold=0.0001)
+                                                         threshold=0.0001, verbose=True)
 
         return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "monitor": "valid/loss"}}

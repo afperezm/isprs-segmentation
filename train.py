@@ -6,7 +6,7 @@ from torchvision import transforms
 
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
@@ -98,6 +98,7 @@ def main():
                                default_hp_metric=False, sub_dir="logs")
 
     # Initialize callbacks
+    early_stopping = EarlyStopping(monitor="train/loss", min_delta=0.0, patience=3)
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     if model_name == "cyclegan" or model_name == "colormapgan":
         checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
@@ -121,7 +122,7 @@ def main():
     # Initialize trainer
     trainer = pl.Trainer(
         logger=logger,
-        callbacks=[lr_monitor, checkpointing],
+        callbacks=[early_stopping, lr_monitor, checkpointing],
         accelerator="auto",
         devices=1,
         max_epochs=epochs,

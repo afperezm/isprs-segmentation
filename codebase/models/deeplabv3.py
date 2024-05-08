@@ -3,16 +3,23 @@ import torchvision
 
 from torch import nn, optim
 from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score
-from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights
+from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV3_ResNet101_Weights
 
 
 class DeepLabV3(pl.LightningModule):
-    def __init__(self, num_classes, learning_rate=0.00005, weight_decay=0.0):
+    def __init__(self, num_classes, backbone='resnet50', learning_rate=0.00005, weight_decay=0.0):
         super(DeepLabV3, self).__init__()
 
         self.save_hyperparameters(logger=False)
 
-        self.model = torchvision.models.segmentation.deeplabv3_resnet50(weights=DeepLabV3_ResNet50_Weights.DEFAULT)
+        if backbone == 'resnet50':
+            self.model = torchvision.models.segmentation.deeplabv3_resnet50(weights=DeepLabV3_ResNet50_Weights.DEFAULT)
+        elif backbone == 'resnet101':
+            self.model = torchvision.models.segmentation.deeplabv3_resnet101(
+                weights=DeepLabV3_ResNet101_Weights.DEFAULT)
+        else:
+            raise ValueError("Invalid backbone selection")
+
         self.model.aux_classifier = None
         self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 

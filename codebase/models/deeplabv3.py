@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 import torchvision
 
 from torch import nn, optim
-from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall
+from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score
 from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights
 
 
@@ -20,6 +20,7 @@ class DeepLabV3(pl.LightningModule):
         self.metric1 = MulticlassJaccardIndex(num_classes)
         self.metric2 = MulticlassPrecision(num_classes)
         self.metric3 = MulticlassRecall(num_classes)
+        self.metric4 = MulticlassF1Score(num_classes)
 
     def shared_step(self, batch):
         images, masks = batch
@@ -31,8 +32,10 @@ class DeepLabV3(pl.LightningModule):
         metric_iou = self.metric1(outputs, masks)
         metric_precision = self.metric2(outputs, masks)
         metric_recall = self.metric3(outputs, masks)
+        metric_accuracy = self.metric4(outputs, masks)
 
-        metrics = {"iou": metric_iou, "precision": metric_precision, "recall": metric_recall}
+        metrics = {"iou": metric_iou, "precision": metric_precision, "recall": metric_recall,
+                   "accuracy": metric_accuracy}
 
         return loss, metrics
 

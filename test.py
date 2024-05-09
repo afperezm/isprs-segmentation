@@ -120,17 +120,17 @@ def main():
 
             for idx, result in enumerate(split_results):
 
-                image_b2a, image_b_name = result[0], result[1][0]
+                image, image_name = result[0], result[1][0]
 
-                print(image_b_name)
+                print(image_name)
 
-                image_b2a = np.transpose(image_b2a.cpu().detach().numpy().squeeze(), (1, 2, 0))
-                image_b2a = (255 * image_b2a).astype(np.uint8)
-                image_b2a = cv2.cvtColor(image_b2a, cv2.COLOR_RGB2BGR)
+                image = np.transpose(image.cpu().detach().numpy().squeeze(), (1, 2, 0))
+                image = (255 * image).astype(np.uint8)
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                print(image_b2a.shape, np.min(image_b2a), np.max(image_b2a))
+                print(image.shape, np.min(image), np.max(image))
 
-                _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_b_name), image_b2a)
+                _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
 
 
 def parse_args():

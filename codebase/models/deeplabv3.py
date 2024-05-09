@@ -1,9 +1,23 @@
 import pytorch_lightning as pl
 import torchvision
 
+from PIL.Image import Image
+
 from torch import nn, optim
 from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score
 from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV3_ResNet101_Weights
+
+
+def make_decoded_grid(tensor):
+    grid = torchvision.utils.make_grid(tensor)[0]
+
+    grid_image = Image.fromarray(grid.byte().cpu().numpy())
+    grid_image.putpalette((255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255))
+
+    grid_array = grid_image.convert("RGB")
+    grid_tensor = torchvision.transforms.functional.pil_to_tensor(grid_array)
+
+    return grid_tensor
 
 
 class DeepLabV3(pl.LightningModule):
@@ -44,10 +58,10 @@ class DeepLabV3(pl.LightningModule):
         metrics = {"iou": metric_iou, "precision": metric_precision, "recall": metric_recall,
                    "accuracy": metric_accuracy}
 
-        return loss, metrics
+        return loss, metrics, outputs
 
     def training_step(self, batch):
-        loss, metrics = self.shared_step(batch)
+        loss, metrics, _ = self.shared_step(batch)
 
         self.log("train/loss", loss, on_step=False, on_epoch=True)
 
@@ -57,17 +71,31 @@ class DeepLabV3(pl.LightningModule):
         return loss
 
     def validation_step(self, batch):
-        loss, metrics = self.shared_step(batch)
+        loss, metrics, outputs = self.shared_step(batch)
 
         self.log("valid/loss", loss, on_step=False, on_epoch=True)
 
         for metric_key, metric_value in metrics.items():
             self.log(f"valid/{metric_key}", metric_value, on_step=False, on_epoch=True)
 
+        images, masks, predictions = batch[0], batch[1], outputs.argmax(dim=1)
+
+        current_epoch = self.current_epoch
+        tensorboard = self.logger.experiment
+
+        grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
+        tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
+
+        grid = make_decoded_grid(masks)
+        tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
+
+        grid = make_decoded_grid(predictions)
+        tensorboard.add_image(tag="valid/predictions", img_tensor=grid, global_step=current_epoch)
+
         return loss
 
     def test_step(self, batch, batch_idx, dataloader_idx=0):
-        loss, metrics = self.shared_step(batch)
+        loss, metrics, _ = self.shared_step(batch)
 
         self.log("test/loss", loss, on_step=False, on_epoch=True)
 

@@ -19,6 +19,7 @@ def main():
     batch_size = PARAMS.batch_size
     learning_rate = PARAMS.learning_rate
     weight_decay = PARAMS.weight_decay
+    lambdas = PARAMS.lambdas
     dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
@@ -127,6 +128,7 @@ def main():
                                                    classifier_weight_decay=weight_decay[1])
         else:
             model = DeepLabV3(num_classes=train_dataset.dataset.num_classes,
+                              loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                               backbone_learning_rate=learning_rate[0], classifier_learning_rate=learning_rate[1],
                               backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1])
     else:
@@ -157,6 +159,7 @@ def parse_args():
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
     parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=[0.0002, 0.0002])
     parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=[0.0, 0.0])
+    parser.add_argument("--lambdas", help="Losses weights", type=float, nargs="+", default=[1.0, 0.0])
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",

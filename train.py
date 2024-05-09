@@ -18,6 +18,7 @@ def main():
     epochs = PARAMS.epochs
     batch_size = PARAMS.batch_size
     learning_rate = PARAMS.learning_rate
+    weight_decay = PARAMS.weight_decay
     dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
@@ -122,7 +123,9 @@ def main():
             model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.dataset.num_classes,
                                                    learning_rate=learning_rate[0])
         else:
-            model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, learning_rate=learning_rate[0])
+            model = DeepLabV3(num_classes=train_dataset.dataset.num_classes,
+                              backbone_learning_rate=learning_rate[0], classifier_learning_rate=learning_rate[1],
+                              backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1])
     else:
         raise ValueError("Invalid model selection")
 
@@ -150,6 +153,7 @@ def parse_args():
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
     parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=0.0002)
+    parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=0.0)
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",

@@ -23,8 +23,9 @@ def make_decoded_grid(tensor):
 
 
 class DeepLabV3(pl.LightningModule):
-    def __init__(self, num_classes, backbone='resnet50', learning_rate=0.00005, weight_decay=0.0,
-                 loss_ce_weight=1.0, loss_dice_weight=0.0):
+    def __init__(self, num_classes, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
+                 backbone_learning_rate=0.00005, classifier_learning_rate=0.00005,
+                 backbone_weight_decay=0.0, classifier_weight_decay=0.0):
         super(DeepLabV3, self).__init__()
 
         self.save_hyperparameters(logger=False)
@@ -114,18 +115,27 @@ class DeepLabV3(pl.LightningModule):
             self.log(f"test/{metric_key}", metric_value, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
-        learning_rate = self.hparams.learning_rate
-        weight_decay = self.hparams.weight_decay
-
-        grouped_parameters = [
-            {'params': self.model.backbone.parameters(), 'lr': learning_rate},
-            {'params': self.model.classifier.parameters(), 'lr': learning_rate * 0.1}
-        ]
+        backbone_learning_rate = self.hparams.backbone_learning_rate
+        classifier_learning_rate = self.hparams.classifier_learning_rate
+        backbone_weight_decay = self.hparams.backbone_weight_decay
+        classifier_weight_decay = self.hparams.classifier_decay
 
         if self.model.aux_classifier:
-            grouped_parameters.append({'params': self.model.aux_classifier.parameters(), 'lr': learning_rate * 0.1})
+            grouped_parameters = [
+                {'params': self.model.backbone.parameters()},
+                {'params': self.model.classifier.parameters(), 'lr': classifier_learning_rate,
+                 'weight_decay': classifier_weight_decay},
+                {'params': self.model.aux_classifier.parameters(), 'lr': classifier_learning_rate,
+                 'weight_decay': classifier_weight_decay}
+            ]
+        else:
+            grouped_parameters = [
+                {'params': self.model.backbone.parameters()},
+                {'params': self.model.classifier.parameters(), 'lr': classifier_learning_rate,
+                 'weight_decay': classifier_weight_decay}
+            ]
 
-        optimizer = optim.Adam(grouped_parameters, lr=learning_rate, weight_decay=weight_decay)
+        optimizer = optim.Adam(grouped_parameters, lr=backbone_learning_rate, weight_decay=backbone_weight_decay)
 
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, patience=7,
                                                          threshold=0.0001, verbose=True)

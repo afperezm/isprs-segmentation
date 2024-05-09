@@ -71,7 +71,7 @@ class DeepLabV3(pl.LightningModule):
 
         return loss
 
-    def validation_step(self, batch):
+    def validation_step(self, batch, batch_idx):
         loss, metrics, outputs = self.shared_step(batch)
 
         self.log("valid/loss", loss, on_step=False, on_epoch=True)
@@ -79,19 +79,20 @@ class DeepLabV3(pl.LightningModule):
         for metric_key, metric_value in metrics.items():
             self.log(f"valid/{metric_key}", metric_value, on_step=False, on_epoch=True)
 
-        images, masks, predictions = batch[0], batch[1], torch.argmax(outputs, dim=1, keepdim=True)
+        if batch_idx == 0:
+            images, masks, predictions = batch[0], batch[1], torch.argmax(outputs, dim=1, keepdim=True)
 
-        current_epoch = self.current_epoch
-        tensorboard = self.logger.experiment
+            current_epoch = self.current_epoch
+            tensorboard = self.logger.experiment
 
-        grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
+            grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
 
-        grid = make_decoded_grid(masks)
-        tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
+            grid = make_decoded_grid(masks)
+            tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
 
-        grid = make_decoded_grid(predictions)
-        tensorboard.add_image(tag="valid/predictions", img_tensor=grid, global_step=current_epoch)
+            grid = make_decoded_grid(predictions)
+            tensorboard.add_image(tag="valid/predictions", img_tensor=grid, global_step=current_epoch)
 
         return loss
 

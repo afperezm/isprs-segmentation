@@ -5,6 +5,7 @@ import sys
 import torch
 
 from torch.utils.data import Dataset, DataLoader
+from torchvision.transforms import transforms
 
 
 class ISPRSDataset(Dataset):
@@ -78,8 +79,11 @@ if __name__ == "__main__":
 
     root_dir = sys.argv[1]
 
-    dataset = ISPRSDataset(data_dir=root_dir, is_train=False)
-    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=1)
+    dataset = ISPRSDataset(data_dir=root_dir, is_train=False, transform=transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
+        ]))
+    dataloader = DataLoader(dataset, batch_size=4, shuffle=False, num_workers=1)
 
     for batch_idx, batch in enumerate(dataloader):
         images, labels = batch

@@ -150,7 +150,7 @@ def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser("Trainer for ColorMapGAN")
+    parser = argparse.ArgumentParser("Generic trainer for UDA adaptation/segmentation")
     parser.add_argument("--data_dir", help="Source dataset directory", nargs="+", required=True)
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)

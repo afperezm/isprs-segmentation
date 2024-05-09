@@ -122,6 +122,7 @@ def main():
     elif model_name == "deeplabv3":
         if ckpt_path and not resume:
             model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.dataset.num_classes,
+                                                   loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                                                    backbone_learning_rate=learning_rate[0],
                                                    classifier_learning_rate=learning_rate[1],
                                                    backbone_weight_decay=weight_decay[0],

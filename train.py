@@ -23,7 +23,7 @@ def main():
     enable_progress_bar = PARAMS.enable_progress_bar
     seed = PARAMS.seed
     ckpt_path = PARAMS.ckpt_path
-    resume_training = PARAMS.resume_training
+    resume = PARAMS.resume
 
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
@@ -119,7 +119,7 @@ def main():
     else:
         raise ValueError("Invalid model selection")
 
-    if ckpt_path and not resume_training:
+    if ckpt_path and not resume:
         model.load_from_checkpoint(ckpt_path)
 
     # Initialize trainer
@@ -133,7 +133,7 @@ def main():
     )
 
     # Perform training
-    if resume_training:
+    if resume:
         trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader, ckpt_path=ckpt_path)
     else:
         trainer.fit(model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
@@ -153,7 +153,7 @@ def parse_args():
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
     parser.add_argument("--ckpt_path", help="Resume checkpoint path")
-    parser.add_argument("--resume_training", help="Resume training", action="store_true")
+    parser.add_argument("--resume", help="Resume training", action="store_true")
     parser.add_argument("--comment", help="Experiment details", default="")
     return parser.parse_args()
 

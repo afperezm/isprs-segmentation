@@ -118,7 +118,7 @@ class DeepLabV3(pl.LightningModule):
         backbone_learning_rate = self.hparams.backbone_learning_rate
         classifier_learning_rate = self.hparams.classifier_learning_rate
         backbone_weight_decay = self.hparams.backbone_weight_decay
-        classifier_weight_decay = self.hparams.classifier_decay
+        classifier_weight_decay = self.hparams.classifier_weight_decay
 
         if self.model.aux_classifier:
             grouped_parameters = [

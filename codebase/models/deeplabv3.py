@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch
+import torchmetrics
 import torchvision
 
 from PIL import Image
@@ -22,7 +23,8 @@ def make_decoded_grid(tensor):
 
 
 class DeepLabV3(pl.LightningModule):
-    def __init__(self, num_classes, backbone='resnet50', learning_rate=0.00005, weight_decay=0.0):
+    def __init__(self, num_classes, backbone='resnet50', learning_rate=0.00005, weight_decay=0.0,
+                 loss_ce_weight=1.0, loss_dice_weight=0.0):
         super(DeepLabV3, self).__init__()
 
         self.save_hyperparameters(logger=False)
@@ -39,25 +41,32 @@ class DeepLabV3(pl.LightningModule):
         self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
         self.criterion = nn.CrossEntropyLoss()
+        self.criterion2 = torchmetrics.Dice(num_classes=num_classes)
         self.metric1 = MulticlassJaccardIndex(num_classes)
         self.metric2 = MulticlassPrecision(num_classes)
         self.metric3 = MulticlassRecall(num_classes)
         self.metric4 = MulticlassF1Score(num_classes)
 
     def shared_step(self, batch):
+        loss_ce_weight = self.hparams.loss_ce_weight
+        loss_dice_weight = self.hparams.loss_dice_weight
+
         images, masks = batch
 
         outputs = self.model(images)['out']
         masks = masks.squeeze(dim=1).long()
 
-        loss = self.criterion(outputs, masks)
+        loss_ce = self.criterion(outputs, masks)
+        loss_dice = self.criterion2(outputs, masks)
+
+        loss = loss_ce_weight * loss_ce + loss_dice_weight * loss_dice
         metric_iou = self.metric1(outputs, masks)
         metric_precision = self.metric2(outputs, masks)
         metric_recall = self.metric3(outputs, masks)
         metric_accuracy = self.metric4(outputs, masks)
 
         metrics = {"iou": metric_iou, "precision": metric_precision, "recall": metric_recall,
-                   "accuracy": metric_accuracy}
+                   "accuracy": metric_accuracy, "loss_ce": loss_ce, "loss_dice": loss_dice}
 
         return loss, metrics, outputs
 

@@ -117,9 +117,12 @@ class DeepLabV3(pl.LightningModule):
         learning_rate = self.hparams.learning_rate
         weight_decay = self.hparams.weight_decay
 
-        parameters = [params for params in self.model.parameters() if params.requires_grad]
+        grouped_parameters = [
+            {'params': self.model.backbone.parameters(), 'lr': learning_rate},
+            {'params': self.model.classifier.parameters(), 'lr': learning_rate * 0.1}
+        ]
 
-        optimizer = optim.Adam(parameters, lr=learning_rate, weight_decay=weight_decay)
+        optimizer = optim.Adam(grouped_parameters, lr=learning_rate, weight_decay=weight_decay)
 
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, patience=7,
                                                          threshold=0.0001, verbose=True)

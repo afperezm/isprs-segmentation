@@ -104,7 +104,7 @@ def main():
     if model_name == "cyclegan" or model_name == "colormapgan":
         checkpointing = ModelCheckpoint(monitor="train/g_loss", save_top_k=5, mode="min")
     elif model_name == "deeplabv3":
-        checkpointing = ModelCheckpoint(monitor="valid/loss", save_top_k=5, mode="min")
+        checkpointing = ModelCheckpoint(monitor="train/loss", save_top_k=5, mode="min")
     else:
         raise ValueError("Invalid model selection")
 

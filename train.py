@@ -155,8 +155,8 @@ def parse_args():
     parser.add_argument("--results_dir", help="Results directory", default="./results/")
     parser.add_argument("--epochs", help="Number of epochs", type=int, default=10)
     parser.add_argument("--batch_size", help="Batch size", type=int, required=True)
-    parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=0.0002)
-    parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=0.0)
+    parser.add_argument("--learning_rate", help="Learning rate", nargs='+', type=float, default=[0.0002, 0.0002])
+    parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=[0.0, 0.0])
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",

@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 import torchvision
 
-from PIL.Image import Image
+from PIL import Image
 
 from torch import nn, optim
 from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score

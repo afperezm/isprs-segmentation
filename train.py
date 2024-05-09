@@ -31,7 +31,10 @@ def main():
     results_dir_root = os.path.dirname(results_dir.rstrip('/'))
     results_dir_name = os.path.basename(results_dir.rstrip('/'))
 
-    exp_name = f"{model_name}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
+    if resume:
+        exp_name = os.path.normpath(ckpt_path).split(os.sep)[-3]
+    else:
+        exp_name = f"{model_name}-{strftime('%y%m%d')}-{strftime('%H%M%S')}"
 
     generator = torch.Generator().manual_seed(seed)
 
@@ -115,12 +118,13 @@ def main():
     elif model_name == "colormapgan":
         model = ColorMapGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
     elif model_name == "deeplabv3":
-        model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, learning_rate=learning_rate[0])
+        if ckpt_path and not resume:
+            model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.dataset.num_classes,
+                                                   learning_rate=learning_rate[0])
+        else:
+            model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, learning_rate=learning_rate[0])
     else:
         raise ValueError("Invalid model selection")
-
-    if ckpt_path and not resume:
-        model.load_from_checkpoint(ckpt_path)
 
     # Initialize trainer
     trainer = pl.Trainer(

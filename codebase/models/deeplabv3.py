@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+import torch
 import torchvision
 
 from PIL import Image
@@ -78,7 +79,7 @@ class DeepLabV3(pl.LightningModule):
         for metric_key, metric_value in metrics.items():
             self.log(f"valid/{metric_key}", metric_value, on_step=False, on_epoch=True)
 
-        images, masks, predictions = batch[0], batch[1], outputs.argmax(dim=1)
+        images, masks, predictions = batch[0], batch[1], torch.argmax(outputs, dim=1, keepdim=True)
 
         current_epoch = self.current_epoch
         tensorboard = self.logger.experiment

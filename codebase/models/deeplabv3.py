@@ -7,7 +7,8 @@ from PIL import Image
 
 from torch import nn, optim
 from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score
-from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV3_ResNet101_Weights
+from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV3_ResNet101_Weights, \
+    DeepLabV3_MobileNet_V3_Large_Weights
 
 
 def make_decoded_grid(tensor):
@@ -30,7 +31,10 @@ class DeepLabV3(pl.LightningModule):
 
         self.save_hyperparameters(logger=False)
 
-        if backbone == 'resnet50':
+        if backbone == 'mobilenet':
+            self.model = torchvision.models.segmentation.deeplabv3_mobilenet_v3_large(
+                weights=DeepLabV3_MobileNet_V3_Large_Weights.DEFAULT)
+        elif backbone == 'resnet50':
             self.model = torchvision.models.segmentation.deeplabv3_resnet50(weights=DeepLabV3_ResNet50_Weights.DEFAULT)
         elif backbone == 'resnet101':
             self.model = torchvision.models.segmentation.deeplabv3_resnet101(
@@ -39,7 +43,10 @@ class DeepLabV3(pl.LightningModule):
             raise ValueError("Invalid backbone selection")
 
         self.model.aux_classifier = None
-        self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
+        if backbone == 'mobilenet':
+            self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(960, num_classes)
+        else:
+            self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
         self.criterion = nn.CrossEntropyLoss()
         self.criterion2 = torchmetrics.Dice(num_classes=num_classes)

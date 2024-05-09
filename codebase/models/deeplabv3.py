@@ -65,7 +65,7 @@ class DeepLabV3(pl.LightningModule):
         masks = masks.squeeze(dim=1).long()
 
         loss_ce = self.criterion(outputs, masks)
-        loss_dice = self.criterion2(outputs, masks)
+        loss_dice = 1.0 - self.criterion2(outputs, masks)
 
         loss = loss_ce_weight * loss_ce + loss_dice_weight * loss_dice
         metric_iou = self.metric1(outputs, masks)

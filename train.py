@@ -96,7 +96,7 @@ def main():
 
     valid_dataloader = DataLoader(
         valid_dataset,
-        batch_size=batch_size,
+        batch_size=4,
         shuffle=False,
         num_workers=8,
         generator=generator

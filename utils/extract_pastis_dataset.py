@@ -30,7 +30,7 @@ def main():
             image_name = f'S2_{ts_idx}_{time_idx:03d}.png'
             image_tensor = ts[0, time_idx, 0:3, :, :]
             image_array = image_tensor.numpy().transpose(1, 2, 0)
-            image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
+            # image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
             mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
             maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
             if np.any((maxs - mins) == 0.0):

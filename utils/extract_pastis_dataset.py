@@ -17,8 +17,8 @@ def main():
 
     for fold in folds:
 
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(output_dir, f'fold_{fold}'):
+            os.makedirs(output_dir, f'fold_{fold}')
 
         dataset = PASTISDataset(folder=data_dir, folds=[fold])
 

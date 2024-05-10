@@ -22,6 +22,9 @@ def main():
     lambdas = PARAMS.lambdas
     dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
+    scheduler_factor = PARAMS.scheduler_factor
+    scheduler_patience = PARAMS.scheduler_patience
+    scheduler_threshold = PARAMS.scheduler_threshold
     enable_progress_bar = PARAMS.enable_progress_bar
     seed = PARAMS.seed
     ckpt_path = PARAMS.ckpt_path
@@ -126,12 +129,17 @@ def main():
                                                    backbone_learning_rate=learning_rate[0],
                                                    classifier_learning_rate=learning_rate[1],
                                                    backbone_weight_decay=weight_decay[0],
-                                                   classifier_weight_decay=weight_decay[1])
+                                                   classifier_weight_decay=weight_decay[1],
+                                                   scheduler_factor=scheduler_factor,
+                                                   scheduler_patience=scheduler_patience,
+                                                   scheduler_threshold=scheduler_threshold)
         else:
             model = DeepLabV3(num_classes=train_dataset.dataset.num_classes,
                               loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                               backbone_learning_rate=learning_rate[0], classifier_learning_rate=learning_rate[1],
-                              backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1])
+                              backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1],
+                              scheduler_factor=scheduler_factor, scheduler_patience=scheduler_patience,
+                              scheduler_threshold=scheduler_threshold)
     else:
         raise ValueError("Invalid model selection")
 
@@ -165,6 +173,9 @@ def parse_args():
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
+    parser.add_argument("--scheduler_factor", help="LR Scheduler reduction factor", type=float, default=0.2)
+    parser.add_argument("--scheduler_patience", help="Number of epochs with improvement", type=int, default=7)
+    parser.add_argument("--scheduler_threshold", help="Threshold to measure improvement", type=float, default=0.0001)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
     parser.add_argument("--ckpt_path", help="Resume checkpoint path")

@@ -26,7 +26,7 @@ def make_decoded_grid(tensor):
 class DeepLabV3(pl.LightningModule):
     def __init__(self, num_classes, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
                  backbone_learning_rate=0.00005, classifier_learning_rate=0.00005,
-                 backbone_weight_decay=0.0, classifier_weight_decay=0.0):
+                 backbone_weight_decay=0.0, classifier_weight_decay=0.0, **kwargs):
         super(DeepLabV3, self).__init__()
 
         self.save_hyperparameters(logger=False)
@@ -127,6 +127,10 @@ class DeepLabV3(pl.LightningModule):
         backbone_weight_decay = self.hparams.backbone_weight_decay
         classifier_weight_decay = self.hparams.classifier_weight_decay
 
+        scheduler_factor = self.hparams.scheduler_factor
+        scheduler_patience = self.hparams.scheduler_patience
+        scheduler_threshold = self.hparams.scheduler_threshold
+
         if self.model.aux_classifier:
             grouped_parameters = [
                 {'params': self.model.backbone.parameters()},
@@ -144,7 +148,8 @@ class DeepLabV3(pl.LightningModule):
 
         optimizer = optim.Adam(grouped_parameters, lr=backbone_learning_rate, weight_decay=backbone_weight_decay)
 
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.2, patience=7,
-                                                         threshold=0.0001, verbose=True)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor,
+                                                         patience=scheduler_patience,
+                                                         threshold=scheduler_threshold, verbose=True)
 
         return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "monitor": "valid/loss"}}

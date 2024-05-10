@@ -5,6 +5,7 @@ import os
 
 from src.dataset import PASTIS_Dataset as PASTISDataset
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 PARAMS = None
 
@@ -20,7 +21,7 @@ def main():
 
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-    for batch_idx, batch in enumerate(dataloader):
+    for batch_idx, batch in enumerate(tqdm(dataloader)):
 
         ts = batch[0][0]
         ts_idx = dataset.id_patches[batch_idx]

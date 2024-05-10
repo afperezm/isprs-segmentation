@@ -32,6 +32,8 @@ def main():
             image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
             mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
             maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
+            if (maxs - mins).mean() == 0:
+                continue
             image_array = 255 * (image_array - mins) / (maxs - mins)
             print(image_name, image_array.shape, np.min(image_array), np.max(image_array))
             _ = cv2.imwrite(os.path.join(output_dir, image_name), image_array)

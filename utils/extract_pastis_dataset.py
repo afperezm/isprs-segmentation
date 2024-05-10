@@ -44,7 +44,7 @@ def parse_args():
     parser = argparse.ArgumentParser("Extract PASTIS dataset images")
     parser.add_argument("--data_dir", help="Dataset directory", required=True)
     parser.add_argument("--output_dir", help="Output directory", required=True)
-    parser.add_argument("--fold", help="Selected fold", type=int, required=True)
+    parser.add_argument("--fold", help="Selected fold", type=int, choices=range(1, 5), required=True)
     return parser.parse_args()
 
 

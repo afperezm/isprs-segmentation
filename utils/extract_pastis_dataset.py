@@ -13,11 +13,12 @@ PARAMS = None
 def main():
     data_dir = PARAMS.data_dir
     output_dir = PARAMS.output_dir
+    fold = PARAMS.fold
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    dataset = PASTISDataset(folder=data_dir, folds=[1])
+    dataset = PASTISDataset(folder=data_dir, folds=[fold])
 
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
@@ -36,13 +37,14 @@ def main():
             if np.any((maxs - mins) == 0.0):
                 continue
             image_array = 255 * (image_array - mins) / (maxs - mins)
-            _ = cv2.imwrite(os.path.join(output_dir, image_name), image_array)
+            _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', image_name), image_array)
 
 
 def parse_args():
     parser = argparse.ArgumentParser("Extract PASTIS dataset images")
     parser.add_argument("--data_dir", help="Dataset directory", required=True)
     parser.add_argument("--output_dir", help="Output directory", required=True)
+    parser.add_argument("--fold", help="Selected fold", type=int, required=True)
     return parser.parse_args()
 
 

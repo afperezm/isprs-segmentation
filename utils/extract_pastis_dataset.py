@@ -34,7 +34,6 @@ def main():
             mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
             maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
             if np.any((maxs - mins) == 0.0):
-                print(image_name, image_array.shape, np.min(image_array), np.max(image_array))
                 continue
             image_array = 255 * (image_array - mins) / (maxs - mins)
             _ = cv2.imwrite(os.path.join(output_dir, image_name), image_array)

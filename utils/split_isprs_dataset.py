@@ -69,6 +69,12 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
         image_patch = image_padded[y:y + patch_size, x:x + patch_size]
         label_patch = label_padded[y:y + patch_size, x:x + patch_size]
 
+        assert image_patch.shape[0] == patch_size
+        assert image_patch.shape[1] == patch_size
+
+        assert label_patch.shape[0] == patch_size
+        assert label_patch.shape[1] == patch_size
+
         image_patch = cv2.cvtColor(np.array(image_patch), cv2.COLOR_BGR2RGB)
         label_patch = cv2.cvtColor(np.array(label_patch), cv2.COLOR_BGR2RGB)
 

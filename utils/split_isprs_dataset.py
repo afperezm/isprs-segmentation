@@ -23,19 +23,7 @@ def pad_image(image, patch_size):
     return image_padded
 
 
-def crop_image(image, patch_size):
-
-    original_height, original_width = image.shape[0], image.shape[1]
-
-    extent_height = int(original_height / patch_size) * patch_size
-    extent_width = int(original_width / patch_size) * patch_size
-
-    image_cropped = image[0:extent_height, 0:extent_width]
-
-    return image_cropped
-
-
-def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride, crop):
+def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride, pad):
 
     images_dir = os.path.join(output_dir, f'images')
     labels_dir = os.path.join(output_dir, f'labels')
@@ -52,12 +40,12 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
     image = tiff.imread(image_path)
     label = tiff.imread(label_path)
 
-    if crop:
-        image_padded = crop_image(image, patch_size)
-        label_padded = crop_image(label, patch_size)
-    else:
+    if pad:
         image_padded = pad_image(image, patch_size)
         label_padded = pad_image(label, patch_size)
+    else:
+        image_padded = image
+        label_padded = label
 
     assert image_padded.shape == label_padded.shape
 
@@ -92,7 +80,7 @@ def main():
     patch_size = PARAMS.patch_size
     stride = PARAMS.stride
     seed = PARAMS.seed
-    crop = PARAMS.crop
+    pad = PARAMS.pad
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -115,7 +103,7 @@ def main():
 
     bar = progressbar.ProgressBar(max_value=num_train_images)
     for idx, (img_path, msk_path) in enumerate(zip(train_images_paths, train_labels_paths)):
-        crop_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, crop)
+        crop_image_and_label(os.path.join(output_dir, 'train'), img_path, msk_path, patch_size, stride, pad)
         bar.update(idx)
     bar.update(num_train_images)
 
@@ -123,7 +111,7 @@ def main():
 
     bar = progressbar.ProgressBar(max_value=num_test_images)
     for idx, (img_path, msk_path) in enumerate(zip(test_images_paths, test_labels_paths)):
-        crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, patch_size, True)
+        crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, patch_size, False)
         bar.update(idx)
     bar.update(num_test_images)
 
@@ -136,7 +124,7 @@ def parse_args():
     parser.add_argument("--patch_size", type=int, default=512)
     parser.add_argument("--stride", type=int, default=256)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--crop", help="Flag to indicate cropping instead of padding", action="store_true")
+    parser.add_argument("--pad", help="Flag to indicate padding", action="store_true")
     return parser.parse_args()
 
 

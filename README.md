@@ -27,6 +27,14 @@ python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Potsdam/3_Ortho_I
 python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-irrg-dataset-256-128/ --patch_size 256 --stride 128 --seed 42
 ```
 
+## Train baseline segmentation models
+
+```bash
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset-256-128/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.0001 0.0001 --model deeplabv3 --dataset isprs --comment "Train DeepLabV3 segmentation model with ResNet-50 backbone on Potsdam RGB images of size 256x256 cropped with a stride of 128"
+python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset-256-128/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.0001 0.0001 --model deeplabv3 --dataset isprs --comment "Train DeepLabV3 segmentation model with ResNet-50 backbone on Potsdam IRRG images of size 256x256 cropped with a stride of 128"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset-256-128/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.0001 0.0001 --model deeplabv3 --dataset isprs --comment "Train DeepLabV3 segmentation model with ResNet-50 backbone on Vaihingen IRRG images of size 256x256 cropped with a stride of 128"
+```
+
 ## Train domain adaptation models
 
 ```bash

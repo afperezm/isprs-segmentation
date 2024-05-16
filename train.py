@@ -49,28 +49,22 @@ def main():
             target_dir=data_dir[1],
             is_train=True
         )
-        # Use four images for validation and the rest for training
-        valid_set_size = 4
-        train_set_size = len(train_dataset) - valid_set_size
     elif dataset_name == "isprs":
         train_dataset = ISPRSDataset(
             data_dir=data_dir[0],
             is_train=True
         )
-        valid_set_size = 0.2
-        train_set_size = 1.0 - valid_set_size
     else:
         raise ValueError("Invalid dataset selection")
 
     # Split training dataset
-    train_dataset, valid_dataset = random_split(train_dataset, [train_set_size, valid_set_size], generator=generator)
+    train_dataset, valid_dataset = random_split(train_dataset, [0.8, 0.2], generator=generator)
 
     if dataset_name == "unpaired":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
-        valid_batch_size = 4
     elif dataset_name == "isprs":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
@@ -84,7 +78,6 @@ def main():
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
         ])
-        valid_batch_size = batch_size
     else:
         raise ValueError("Invalid dataset selection")
 
@@ -98,7 +91,7 @@ def main():
 
     valid_dataloader = DataLoader(
         valid_dataset,
-        batch_size=valid_batch_size,
+        batch_size=batch_size,
         shuffle=False,
         num_workers=8,
         generator=generator

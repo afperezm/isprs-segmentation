@@ -51,24 +51,26 @@ class ColorMapGAN(pl.LightningModule):
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
     def validation_step(self, batch, batch_idx):
-        source_images, target_images = batch
 
-        current_epoch = self.current_epoch
-        global_step = self.global_step
-        tensorboard = self.logger.experiment
+        if batch_idx == 0:
+            source_images, target_images = batch
 
-        print(f'current_epoch={current_epoch} global_step={global_step}')
+            current_epoch = self.current_epoch
+            global_step = self.global_step
+            tensorboard = self.logger.experiment
 
-        target_images_adapted = self.generator(target_images)
+            print(f'current_epoch={current_epoch} global_step={global_step}')
 
-        grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
+            target_images_adapted = self.generator(target_images)
 
-        grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)
+            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
 
-        grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
-        tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
+            grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)
+
+            grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         source_images, target_images = batch[0], batch[1]

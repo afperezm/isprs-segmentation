@@ -51,6 +51,13 @@ python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihin
 python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam IRRG"
 ```
 
+## Train PASTIS domain adaptation models
+
+```bash
+python -u train.py --data_dir $HOME/data/pastis-dataset-exploded/fold_4/ $HOME/data/pastis-dataset-exploded/folds_1_2_3/ --results_dir ./results/pastis/ --epochs 50 --batch_size 1 --learning_rate 0.00001 0.00001 --dataset unpaired --model cyclegan --comment "PASTIS tiles 1-2-3 to PASTIS tile 4"
+python -u train.py --data_dir $HOME/data/pastis-dataset-exploded/fold_4/ $HOME/data/pastis-dataset-exploded/folds_1_2_3/ --results_dir ./results/pastis/ --epochs 10 --batch_size 1 --learning_rate 0.00005 0.00001 --dataset unpaired --model colormapgan --comment "PASTIS tiles 1-2-3 to PASTIS tile 4"
+```
+
 ## Test domain adaptation models
 
 ```bash

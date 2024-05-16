@@ -45,8 +45,8 @@ python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/pots
 ```
 
 ```bash
-python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
-python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-rgb-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam RGB"
+python -u train.py --data_dir $HOME/data/potsdam-rgb-dataset-256-128/ $HOME/data/vaihingen-irrg-dataset-256-128/ --results_dir ./results/isprs/ --epochs 10 --batch_size 32 --learning_rate 0.00005 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam RGB"
+python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset-256-128/ $HOME/data/potsdam-rgb-dataset-256-128/ --results_dir ./results/isprs/ --epochs 10 --batch_size 32 --learning_rate 0.00005 0.00001 --dataset unpaired --model colormapgan --comment "Potsdam RGB to Vaihingen IRRG"
 python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset/ $HOME/data/vaihingen-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Potsdam IRRG to Vaihingen IRRG"
 python -u train.py --data_dir $HOME/data/vaihingen-irrg-dataset/ $HOME/data/potsdam-irrg-dataset/ --results_dir ./results/colormapgan/ --epochs 5 --batch_size 1 --learning_rate 0.0001 0.00001 --dataset unpaired --model colormapgan --comment "Vaihingen IRRG to Potsdam IRRG"
 ```

@@ -101,7 +101,7 @@ def main():
 
     # Initialize logger
     logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
-                               default_hp_metric=True, sub_dir="logs")
+                               default_hp_metric=False, sub_dir="logs")
 
     # Initialize callbacks
     lr_monitor = LearningRateMonitor(logging_interval="epoch")

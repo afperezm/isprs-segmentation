@@ -40,7 +40,7 @@ def main():
                 # image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
                 mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
                 maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
-                images_stats[image_name] = dict(mins=list(mins), maxs=list(maxs))
+                images_stats[image_name] = dict(mins=mins.tolist(), maxs=maxs.tolist())
                 if np.any((maxs - mins) == 0.0):
                     continue
                 image_array = 255 * (image_array - mins) / (maxs - mins)

@@ -17,8 +17,8 @@ def main():
 
     for fold in folds:
 
-        if not os.path.exists(os.path.join(output_dir, f'fold_{fold}')):
-            os.makedirs(os.path.join(output_dir, f'fold_{fold}'))
+        if not os.path.exists(os.path.join(output_dir, f'fold_{fold}', 'train', 'images')):
+            os.makedirs(os.path.join(output_dir, f'fold_{fold}', 'train', 'images'))
 
         dataset = PASTISDataset(folder=data_dir, folds=[fold])
 
@@ -39,7 +39,7 @@ def main():
                 if np.any((maxs - mins) == 0.0):
                     continue
                 image_array = 255 * (image_array - mins) / (maxs - mins)
-                _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', image_name), image_array)
+                _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', image_name), image_array)
 
 
 def parse_args():

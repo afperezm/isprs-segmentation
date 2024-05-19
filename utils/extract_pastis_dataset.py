@@ -34,17 +34,18 @@ def main():
             ts_idx = dataset.id_patches[batch_idx]
 
             for time_idx in range(ts.shape[1]):
-                image_name = f'S2_{ts_idx}_{time_idx:03d}.png'
+                image_name = f'S2_{ts_idx}_{time_idx:03d}'
                 image_tensor = ts[0, time_idx, 0:3, :, :]
                 image_array = image_tensor.numpy().transpose(1, 2, 0)
                 # image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
                 mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
                 maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
-                images_stats[image_name] = dict(mins=mins.tolist(), maxs=maxs.tolist())
+                images_stats[image_name] = dict(mins=mins.squeeze().tolist(), maxs=maxs.squeeze().tolist())
                 if np.any((maxs - mins) == 0.0):
                     continue
                 image_array = 255 * (image_array - mins) / (maxs - mins)
-                _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', image_name), image_array)
+                _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', f'{image_name}.png'),
+                                image_array)
 
     with open(os.path.join(output_dir, "STATS_S2_images.json"), "w") as file:
         file.write(json.dumps(images_stats, indent=4))

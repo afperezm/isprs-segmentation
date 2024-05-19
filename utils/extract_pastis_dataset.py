@@ -1,4 +1,6 @@
 import argparse
+import json
+
 import cv2
 import numpy as np
 import os
@@ -14,6 +16,8 @@ def main():
     data_dir = PARAMS.data_dir
     output_dir = PARAMS.output_dir
     folds = PARAMS.folds
+
+    images_stats = {}
 
     for fold in folds:
 
@@ -36,10 +40,14 @@ def main():
                 # image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
                 mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
                 maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
+                images_stats[image_name] = dict(mins=list(mins), maxs=list(maxs))
                 if np.any((maxs - mins) == 0.0):
                     continue
                 image_array = 255 * (image_array - mins) / (maxs - mins)
                 _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', image_name), image_array)
+
+    with open(os.path.join(output_dir, "STATS_S2_images.json"), "w") as file:
+        file.write(json.dumps(images_stats, indent=4))
 
 
 def parse_args():

@@ -78,9 +78,9 @@ class DeepLabV3(pl.LightningModule):
 
         return loss, metrics, outputs
 
-    def on_train_start(self):
-        metrics = {"valid/iou": 0, "valid/precision": 0, "valid/recall": 0, "valid/accuracy": 0}
-        self.logger.log_hyperparams(self.hparams, metrics)
+    # def on_train_start(self):
+    #     metrics = {"valid/iou": 0, "valid/precision": 0, "valid/recall": 0, "valid/accuracy": 0}
+    #     self.logger.log_hyperparams(self.hparams, metrics)
 
     def training_step(self, batch):
         loss, metrics, _ = self.shared_step(batch)

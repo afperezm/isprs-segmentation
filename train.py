@@ -30,6 +30,8 @@ def main():
     ckpt_path = PARAMS.ckpt_path
     resume = PARAMS.resume
 
+    torch.set_float32_matmul_precision('highest')
+
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 

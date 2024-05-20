@@ -150,6 +150,6 @@ class DeepLabV3(pl.LightningModule):
 
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor,
                                                          patience=scheduler_patience,
-                                                         threshold=scheduler_threshold, verbose=True)
+                                                         threshold=scheduler_threshold)
 
         return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "monitor": "valid/loss"}}

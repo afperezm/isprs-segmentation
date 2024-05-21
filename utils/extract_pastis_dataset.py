@@ -38,12 +38,12 @@ def main():
                 image_tensor = ts[0, time_idx, 0:3, :, :]
                 image_array = image_tensor.numpy().transpose(1, 2, 0)
                 # image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
-                mins = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
-                maxs = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
-                images_stats[image_name] = dict(mins=mins.squeeze().tolist(), maxs=maxs.squeeze().tolist())
-                if np.any((maxs - mins) == 0.0):
+                min_vals = np.percentile(image_array, 0.0, axis=(0, 1), keepdims=True)
+                max_vals = np.percentile(image_array, 100.0, axis=(0, 1), keepdims=True)
+                if np.any((max_vals - min_vals) == 0.0):
                     continue
-                image_array = 255 * (image_array - mins) / (maxs - mins)
+                images_stats[image_name] = dict(mins=min_vals.squeeze().tolist(), maxs=max_vals.squeeze().tolist())
+                image_array = 255 * (image_array - min_vals) / (max_vals - min_vals)
                 _ = cv2.imwrite(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', f'{image_name}.png'),
                                 image_array)
 

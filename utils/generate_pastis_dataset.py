@@ -24,26 +24,20 @@ def main():
     with open(os.path.join(extract_dir, "STATS_S2_images.json"), "r") as file:
         images_stats = json.loads(file.read())
 
-    images_keys = sorted(images_stats.keys())
-
-    patches_dict = {}
-
-    for image_key in images_keys:
-        patch_key = image_key.split('_')[1]
-        if patch_key in patches_dict:
-            patches_dict[patch_key].append(image_key)
-        else:
-            patches_dict[patch_key] = []
-
-    def parse_path(file_path):
+    def parse_filename(file_path):
         return os.path.splitext(os.path.basename(file_path))[0]
 
-    images_paths_list = glob.glob(os.path.join(extract_dir, '**', "*.png"), recursive=True)
-    images_paths_dict = {parse_path(image_path): image_path for image_path in images_paths_list}
+    patches_paths_list = glob.glob(os.path.join(data_dir, 'DATA_S2', '*.npy'))
+    patches_paths_list = [(parse_filename(patch_path).split('_')[1], patch_path) for patch_path in patches_paths_list]
 
-    for patch_key, images_keys in tqdm(patches_dict.items()):
+    images_paths_list = glob.glob(os.path.join(extract_dir, '**', "*.png"), recursive=True)
+    images_paths_dict = {parse_filename(image_path): image_path for image_path in images_paths_list}
+
+    for patch_key, patch_path in tqdm(patches_paths_list):
         images_list = []
-        for image_idx, image_key in enumerate(images_keys):
+        patch = np.load(patch_path)
+        for image_idx in range(patch.shape[0]):
+            image_key = f'S2_{patch_key}_{image_idx:03d}'
             if image_key in images_paths_dict:
                 # Load image and convert color
                 image = cv2.imread(images_paths_dict[image_key])
@@ -59,7 +53,6 @@ def main():
                 image = image * std_vals + avg_vals
             else:
                 # Fall back to use non-adapted image
-                patch = np.load(os.path.join(data_dir, 'DATA_S2', f'S2_{patch_key}.npy'))
                 image = patch[image_idx, 0:3, :, :].transpose(1, 2, 0)
             # Append de-normalised image
             images_list.append(image)

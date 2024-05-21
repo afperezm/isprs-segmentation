@@ -59,7 +59,7 @@ def main():
                 image = image * std_vals + avg_vals
             else:
                 # Fall back to use non-adapted image
-                patch = np.load(os.path.join(data_dir, f'S2_{patch_key}.npy'))
+                patch = np.load(os.path.join(data_dir, 'DATA_S2', f'S2_{patch_key}.npy'))
                 image = patch[image_idx, 0:3, :, :].transpose(1, 2, 0)
             # Append de-normalised image
             images_list.append(image)

@@ -23,6 +23,7 @@ def main():
     dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
     enable_progress_bar = PARAMS.enable_progress_bar
+    is_train = PARAMS.is_train
     test_only = PARAMS.test_only
     predict_only = PARAMS.predict_only
 
@@ -37,31 +38,14 @@ def main():
         train_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
-            is_train=True,
-            include_names=True,
-            transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
-        )
-
-        test_dataset = UnpairedDataset(
-            source_dir=data_dir[0],
-            target_dir=data_dir[1],
-            is_train=False,
+            is_train=is_train,
             include_names=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
         )
     elif dataset_name == "isprs":
         train_dataset = ISPRSDataset(
             data_dir=data_dir[0],
-            is_train=True,
-            transform=transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
-            ])
-        )
-
-        test_dataset = ISPRSDataset(
-            data_dir=data_dir[0],
-            is_train=False,
+            is_train=is_train,
             transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
@@ -143,6 +127,7 @@ def parse_args():
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
+    parser.add_argument("--is_train", help="Flag to indicate usage of train split", action="store_true")
     parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")
     parser.add_argument("--predict_only", help="Flag to disable test phase and predict only", action="store_true")
     return parser.parse_args()

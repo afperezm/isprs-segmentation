@@ -61,13 +61,6 @@ def main():
         num_workers=8
     )
 
-    test_dataloader = DataLoader(
-        test_dataset,
-        batch_size=1,
-        shuffle=False,
-        num_workers=8
-    )
-
     if model_name == "cyclegan":
         model = CycleGAN.load_from_checkpoint(ckpt_path)
     elif model_name == "colormapgan":
@@ -83,14 +76,14 @@ def main():
 
     if not predict_only:
         # Perform evaluation
-        results = trainer.test(model=model, dataloaders=[train_dataloader, test_dataloader])
+        results = trainer.test(model=model, dataloaders=[train_dataloader])
 
         # Print evaluation results
         print(results)
 
     if not test_only:
         # Perform prediction
-        results = trainer.predict(model=model, dataloaders=[train_dataloader, test_dataloader])
+        results = trainer.predict(model=model, dataloaders=[train_dataloader])
 
         assert len(results) == 2
 

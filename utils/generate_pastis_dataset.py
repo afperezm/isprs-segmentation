@@ -57,7 +57,7 @@ def main():
             # Append de-normalised image
             images_list.append(image)
         # Store stacked images
-        images_stack = np.array(images_list)
+        images_stack = np.array(images_list).transpose((0, 3, 1, 2))
         np.save(os.path.join(output_dir, f'S2_{patch_key}.npy'), images_stack)
 
 

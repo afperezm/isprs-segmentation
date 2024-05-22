@@ -87,29 +87,25 @@ def main():
         # Perform prediction
         results = trainer.predict(model=model, dataloaders=[train_dataloader])
 
-        assert len(results) == 2
-
         # Save predictions
-        for split_idx, split_results in enumerate(results):
+        if is_train:
+            split_name = "train"
+        else:
+            split_name = "test"
 
-            if split_idx == 0:
-                split_name = "train"
-            else:
-                split_name = "test"
+        for idx, result in enumerate(results):
 
-            for idx, result in enumerate(split_results):
+            image, image_name = result[0], result[1][0]
 
-                image, image_name = result[0], result[1][0]
+            print(image_name)
 
-                print(image_name)
+            image = np.transpose(image.cpu().detach().numpy().squeeze(), (1, 2, 0))
+            image = (255 * image).astype(np.uint8)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                image = np.transpose(image.cpu().detach().numpy().squeeze(), (1, 2, 0))
-                image = (255 * image).astype(np.uint8)
-                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            print(image.shape, np.min(image), np.max(image))
 
-                print(image.shape, np.min(image), np.max(image))
-
-                _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
+            _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
 
 
 def parse_args():

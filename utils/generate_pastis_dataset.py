@@ -30,7 +30,7 @@ def main():
     patches_paths_list = glob.glob(os.path.join(data_dir, 'DATA_S2', '*.npy'))
     patches_paths_list = [(parse_filename(patch_path).split('_')[1], patch_path) for patch_path in patches_paths_list]
 
-    images_paths_list = glob.glob(os.path.join(extract_dir, '**', "*.png"), recursive=True)
+    images_paths_list = glob.glob(os.path.join(extract_dir, '**', "*.npy"), recursive=True)
     images_paths_dict = {parse_filename(image_path): image_path for image_path in images_paths_list}
 
     for patch_key, patch_path in tqdm(patches_paths_list):
@@ -40,8 +40,7 @@ def main():
             image_key = f'S2_{patch_key}_{image_idx:03d}'
             if image_key in images_paths_dict:
                 # Load image and convert color
-                image = cv2.imread(images_paths_dict[image_key])
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                image = np.load(images_paths_dict[image_key])
                 # De-normalise image with image statistics
                 min_vals = np.array(images_stats[image_key]['mins'])
                 max_vals = np.array(images_stats[image_key]['maxs'])

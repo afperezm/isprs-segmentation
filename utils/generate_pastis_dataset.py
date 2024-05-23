@@ -41,10 +41,10 @@ def main():
             if image_key in images_paths_dict:
                 # Load image and convert color
                 image = np.load(images_paths_dict[image_key])
-                # De-normalise image with image statistics
-                min_vals = np.array(images_stats[image_key]['mins'])
-                max_vals = np.array(images_stats[image_key]['maxs'])
-                image = (max_vals - min_vals) * image / 255 + min_vals
+                # # De-normalise image with image statistics
+                # min_vals = np.array(images_stats[image_key]['mins'])
+                # max_vals = np.array(images_stats[image_key]['maxs'])
+                # image = (max_vals - min_vals) * image / 255 + min_vals
                 # De-normalize image with fold statistics
                 fold_name = images_paths_dict[image_key].split(os.sep)[-4].capitalize()
                 avg_vals = np.expand_dims(folds_stats[fold_name]['mean'][0:3], axis=(0, 1))

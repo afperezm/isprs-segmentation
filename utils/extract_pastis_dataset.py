@@ -42,7 +42,7 @@ def main():
                 if np.any((max_vals - min_vals) == 0.0):
                     continue
                 images_stats[image_name] = dict(mins=min_vals.squeeze().tolist(), maxs=max_vals.squeeze().tolist())
-                image_array = (image_array - min_vals) / (max_vals - min_vals)
+                # image_array = (image_array - min_vals) / (max_vals - min_vals)
                 np.save(os.path.join(output_dir, f'fold_{fold}', 'train', 'images', f'{image_name}.npy'), image_array)
 
     with open(os.path.join(output_dir, "STATS_S2_images.json"), "w") as file:

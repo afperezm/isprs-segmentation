@@ -1,7 +1,7 @@
 import argparse
 import cv2
 import glob
-# import json
+import json
 import numpy as np
 import os
 
@@ -18,11 +18,11 @@ def main():
     if not os.path.exists(os.path.join(output_dir)):
         os.makedirs(os.path.join(output_dir))
 
-    # with open(os.path.join(data_dir, "NORM_S2_patch.json"), "r") as file:
-    #     folds_stats = json.loads(file.read())
-    #
-    # with open(os.path.join(extract_dir, "STATS_S2_images.json"), "r") as file:
-    #     images_stats = json.loads(file.read())
+    with open(os.path.join(data_dir, "NORM_S2_patch.json"), "r") as file:
+        folds_stats = json.loads(file.read())
+
+    with open(os.path.join(extract_dir, "STATS_S2_images.json"), "r") as file:
+        images_stats = json.loads(file.read())
 
     def parse_filename(file_path):
         return os.path.splitext(os.path.basename(file_path))[0]
@@ -42,15 +42,15 @@ def main():
                 # Load image and convert color
                 image = cv2.imread(images_paths_dict[image_key])
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                # # De-normalise image with image statistics
-                # min_vals = np.array(images_stats[image_key]['mins'])
-                # max_vals = np.array(images_stats[image_key]['maxs'])
-                # image = (max_vals - min_vals) * image / 255 + min_vals
-                # # De-normalize image with fold statistics
-                # fold_name = images_paths_dict[image_key].split(os.sep)[-4].capitalize()
-                # avg_vals = np.expand_dims(folds_stats[fold_name]['mean'][0:3], axis=(0, 1))
-                # std_vals = np.expand_dims(folds_stats[fold_name]['std'][0:3], axis=(0, 1))
-                # image = image * std_vals + avg_vals
+                # De-normalise image with image statistics
+                min_vals = np.array(images_stats[image_key]['mins'])
+                max_vals = np.array(images_stats[image_key]['maxs'])
+                image = (max_vals - min_vals) * image / 255 + min_vals
+                # De-normalize image with fold statistics
+                fold_name = images_paths_dict[image_key].split(os.sep)[-4].capitalize()
+                avg_vals = np.expand_dims(folds_stats[fold_name]['mean'][0:3], axis=(0, 1))
+                std_vals = np.expand_dims(folds_stats[fold_name]['std'][0:3], axis=(0, 1))
+                image = image * std_vals + avg_vals
             else:
                 # Fall back to use non-adapted image
                 image = patch[image_idx, 0:3, :, :].transpose(1, 2, 0)

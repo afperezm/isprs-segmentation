@@ -7,7 +7,7 @@ from torchvision import transforms
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
-from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
 
@@ -110,8 +110,9 @@ def main():
     )
 
     # Initialize logger
-    logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
-                               default_hp_metric=False, sub_dir="logs")
+    tb_logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
+                                  default_hp_metric=False, sub_dir="logs")
+    wb_logger = WandbLogger(name=exp_name, project="UDA for Remote Sensing Image Semantic Segmentation")
 
     # Initialize callbacks
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
@@ -123,7 +124,8 @@ def main():
         raise ValueError("Invalid model selection")
 
     # Dump program arguments
-    logger.log_hyperparams(params=PARAMS)
+    tb_logger.log_hyperparams(params=PARAMS)
+    wb_logger.log_hyperparams(params=PARAMS)
 
     if model_name == "cyclegan":
         model = CycleGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
@@ -152,7 +154,7 @@ def main():
 
     # Initialize trainer
     trainer = pl.Trainer(
-        logger=logger,
+        logger=[tb_logger, wb_logger],
         callbacks=[lr_monitor, checkpointing],
         accelerator="auto",
         devices=1,

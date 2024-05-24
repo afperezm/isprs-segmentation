@@ -2,6 +2,7 @@ import cv2
 import os
 import sys
 
+import numpy as np
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -41,10 +42,25 @@ class UnpairedDataset(Dataset):
         path_source = os.path.join(self.source_dir, self.phase, 'images', source_name)
         path_target = os.path.join(self.target_dir, self.phase, 'images', target_name)
 
-        img_source = cv2.imread(path_source)
-        img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)
-        img_target = cv2.imread(path_target)
-        img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2RGB)
+        _, source_ext = os.path.splitext(source_name)
+
+        if source_ext == 'png':
+            img_source = cv2.imread(path_source)
+            img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)
+        elif source_ext == 'npy':
+            img_source = np.load(path_source)
+        else:
+            raise ValueError("Invalid source image extension")
+
+        _, target_ext = os.path.splitext(source_name)
+
+        if target_ext == 'png':
+            img_target = cv2.imread(path_target)
+            img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2RGB)
+        elif target_ext == 'npy':
+            img_target = np.load(path_target)
+        else:
+            raise ValueError("Invalid target image extension")
 
         if self.transform:
             img_source = self.transform(img_source)

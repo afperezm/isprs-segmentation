@@ -22,6 +22,7 @@ def main():
     lambdas = PARAMS.lambdas
     dataset_name = PARAMS.dataset_name
     model_name = PARAMS.model_name
+    valid_size = PARAMS.valid_size
     scheduler_factor = PARAMS.scheduler_factor
     scheduler_patience = PARAMS.scheduler_patience
     scheduler_threshold = PARAMS.scheduler_threshold
@@ -60,7 +61,8 @@ def main():
         raise ValueError("Invalid dataset selection")
 
     # Split training dataset
-    train_dataset, valid_dataset = random_split(train_dataset, [0.8, 0.2], generator=generator)
+    train_size = 1.0 - valid_size
+    train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
 
     if dataset_name == "unpaired":
         train_dataset.dataset.transform = transforms.Compose([
@@ -172,6 +174,7 @@ def parse_args():
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
+    parser.add_argument("--valid_size", help="Validation dataset size", type=float, default=0.2)
     parser.add_argument("--scheduler_factor", help="LR Scheduler reduction factor", type=float, default=0.2)
     parser.add_argument("--scheduler_patience", help="Number of epochs with improvement", type=int, default=7)
     parser.add_argument("--scheduler_threshold", help="Threshold to measure improvement", type=float, default=0.0001)

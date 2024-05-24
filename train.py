@@ -46,7 +46,7 @@ def main():
 
     generator = torch.Generator().manual_seed(seed)
 
-    if dataset_name == "unpaired":
+    if dataset_name == "unpaired" or dataset_name == "unpaired-pastis":
         train_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
@@ -70,6 +70,12 @@ def main():
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
         valid_batch_size = 4 if batch_size == 1 else batch_size
+    elif dataset_name == "unpaired-pastis":
+            train_dataset.dataset.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+            ])
+            valid_batch_size = 4 if batch_size == 1 else batch_size
     elif dataset_name == "isprs":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
@@ -171,7 +177,7 @@ def parse_args():
     parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=[0.0, 0.0])
     parser.add_argument("--lambdas", help="Losses weights", type=float, nargs="+", default=[1.0, 0.0])
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
-                        choices=["unpaired", "isprs"], required=True)
+                        choices=["unpaired", "unpaired-pastis", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
     parser.add_argument("--valid_size", help="Validation dataset size", type=float, default=0.2)

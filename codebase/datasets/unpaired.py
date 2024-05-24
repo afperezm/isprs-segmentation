@@ -44,20 +44,20 @@ class UnpairedDataset(Dataset):
 
         _, source_ext = os.path.splitext(source_name)
 
-        if source_ext == 'png':
+        if source_ext == '.png':
             img_source = cv2.imread(path_source)
             img_source = cv2.cvtColor(img_source, cv2.COLOR_BGR2RGB)
-        elif source_ext == 'npy':
+        elif source_ext == '.npy':
             img_source = np.load(path_source)
         else:
             raise ValueError("Invalid source image extension")
 
         _, target_ext = os.path.splitext(source_name)
 
-        if target_ext == 'png':
+        if target_ext == '.png':
             img_target = cv2.imread(path_target)
             img_target = cv2.cvtColor(img_target, cv2.COLOR_BGR2RGB)
-        elif target_ext == 'npy':
+        elif target_ext == '.npy':
             img_target = np.load(path_target)
         else:
             raise ValueError("Invalid target image extension")

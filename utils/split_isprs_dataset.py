@@ -79,6 +79,7 @@ def main():
     output_dir = PARAMS.output_dir
     patch_size = PARAMS.patch_size
     stride = PARAMS.stride
+    test_size = PARAMS.test_size
     seed = PARAMS.seed
     pad = PARAMS.pad
 
@@ -96,8 +97,8 @@ def main():
 
     assert num_images == num_labels
 
-    train_images_paths, test_images_paths = train_test_split(images_paths, test_size=0.2, random_state=seed)
-    train_labels_paths, test_labels_paths = train_test_split(labels_paths, test_size=0.2, random_state=seed)
+    train_images_paths, test_images_paths = train_test_split(images_paths, test_size=test_size, random_state=seed)
+    train_labels_paths, test_labels_paths = train_test_split(labels_paths, test_size=test_size, random_state=seed)
 
     num_train_images = len(train_images_paths)
 
@@ -123,6 +124,7 @@ def parse_args():
     parser.add_argument("--output_dir", required=True)
     parser.add_argument("--patch_size", type=int, default=512)
     parser.add_argument("--stride", type=int, default=256)
+    parser.add_argument("--test_size", help="Test dataset size", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--pad", help="Flag to indicate padding", action="store_true")
     return parser.parse_args()

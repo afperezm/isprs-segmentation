@@ -118,7 +118,7 @@ def main():
     lr_monitor = LearningRateMonitor(logging_interval="epoch")
     if model_name == "cyclegan" or model_name == "colormapgan":
         checkpointing = ModelCheckpoint(monitor="train/g_loss", save_last=True, save_top_k=5, mode="min")
-    elif model_name == "deeplabv3":
+    elif model_name == "deeplabv3" or model_name == "deeplabv3-resnet101":
         checkpointing = ModelCheckpoint(monitor="valid/loss", save_last=True, save_top_k=5, mode="min")
     else:
         raise ValueError("Invalid model selection")
@@ -131,9 +131,11 @@ def main():
         model = CycleGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
     elif model_name == "colormapgan":
         model = ColorMapGAN(lr_gen=learning_rate[0], lr_dis=learning_rate[1])
-    elif model_name == "deeplabv3":
+    elif model_name == "deeplabv3" or model_name == "deeplabv3-resnet101":
+        backbone = "resnet50" if len(model_name.split('-')) == 1 else "resnet101"
         if ckpt_path and not resume:
             model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.dataset.num_classes,
+                                                   backbone=backbone,
                                                    loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                                                    backbone_learning_rate=learning_rate[0],
                                                    classifier_learning_rate=learning_rate[1],
@@ -143,7 +145,7 @@ def main():
                                                    scheduler_patience=scheduler_patience,
                                                    scheduler_threshold=scheduler_threshold)
         else:
-            model = DeepLabV3(num_classes=train_dataset.dataset.num_classes,
+            model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, backbone=backbone,
                               loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                               backbone_learning_rate=learning_rate[0], classifier_learning_rate=learning_rate[1],
                               backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1],
@@ -181,7 +183,7 @@ def parse_args():
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
                         choices=["unpaired", "unpaired-pastis", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
-                        choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
+                        choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--valid_size", help="Validation dataset size", type=float, default=0.2)
     parser.add_argument("--scheduler_factor", help="LR Scheduler reduction factor", type=float, default=0.2)
     parser.add_argument("--scheduler_patience", help="Number of epochs with improvement", type=int, default=7)

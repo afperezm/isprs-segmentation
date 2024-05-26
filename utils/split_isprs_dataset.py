@@ -10,6 +10,18 @@ import tifffile as tiff
 from sklearn.model_selection import train_test_split
 
 
+def crop_image(image, stride):
+
+    original_height, original_width = image.shape[0], image.shape[1]
+
+    cropped_height = stride * int(original_height / stride)
+    cropped_width = stride * int(original_width / stride)
+
+    image_cropped = image[0:cropped_height, 0:cropped_width, :]
+
+    return image_cropped
+
+
 def pad_image(image, patch_size):
 
     original_height, original_width = image.shape[0], image.shape[1]
@@ -44,14 +56,14 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
         image_padded = pad_image(image, patch_size)
         label_padded = pad_image(label, patch_size)
     else:
-        image_padded = image
-        label_padded = label
+        image_padded = crop_image(image, stride)
+        label_padded = crop_image(label, stride)
 
     assert image_padded.shape == label_padded.shape
 
     image_height, image_width = image_padded.shape[0], image_padded.shape[1]
 
-    patches_coords = [(x, y) for y in range(0, image_height - patch_size, stride) for x in range(0, image_width - patch_size, stride)]
+    patches_coords = [(x, y) for y in range(0, image_height, stride) for x in range(0, image_width, stride)]
 
     for patch_index, (x, y) in enumerate(patches_coords, 1):
         image_patch = image_padded[y:y + patch_size, x:x + patch_size]
@@ -82,6 +94,8 @@ def main():
     test_size = PARAMS.test_size
     seed = PARAMS.seed
     pad = PARAMS.pad
+
+    assert patch_size % stride == 0
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)

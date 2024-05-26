@@ -10,12 +10,12 @@ import tifffile as tiff
 from sklearn.model_selection import train_test_split
 
 
-def crop_image(image, stride):
+def crop_image(image, patch_size):
 
     original_height, original_width = image.shape[0], image.shape[1]
 
-    cropped_height = stride * int(original_height / stride)
-    cropped_width = stride * int(original_width / stride)
+    cropped_height = patch_size * int(original_height / patch_size)
+    cropped_width = patch_size * int(original_width / patch_size)
 
     image_cropped = image[0:cropped_height, 0:cropped_width, :]
 
@@ -56,8 +56,8 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
         image_padded = pad_image(image, patch_size)
         label_padded = pad_image(label, patch_size)
     else:
-        image_padded = crop_image(image, stride)
-        label_padded = crop_image(label, stride)
+        image_padded = crop_image(image, patch_size)
+        label_padded = crop_image(label, patch_size)
 
     assert image_padded.shape == label_padded.shape
 

@@ -119,7 +119,7 @@ def parse_args():
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
                         choices=["unpaired", "isprs"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
-                        choices=["cyclegan", "colormapgan", "deeplabv3"], required=True)
+                        choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--is_train", help="Flag to indicate usage of train split", action="store_true")
     parser.add_argument("--test_only", help="Flag to disable predict phase and test only", action="store_true")

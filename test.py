@@ -69,6 +69,9 @@ def main():
         model = ColorMapGAN.load_from_checkpoint(ckpt_path)
     elif model_name == "deeplabv3":
         model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.num_classes)
+    elif model_name == "deeplabv3-resnet101":
+        backbone = "resnet50" if len(model_name.split('-')) == 1 else "resnet101"
+        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.num_classes, backbone=backbone)
     else:
         raise ValueError("Invalid model selection")
 

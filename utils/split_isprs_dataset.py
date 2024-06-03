@@ -63,32 +63,28 @@ def crop_image_and_label(output_dir, image_path, label_path, patch_size, stride,
 
     image_height, image_width = image_padded.shape[0], image_padded.shape[1]
 
-    patch_index = 0
+    patches_coords = [(x, y) for y in range(0, image_height, stride) if y + patch_size <= image_height for x in
+                      range(0, image_width, stride) if x + patch_size <= image_height]
 
-    for y in range(0, image_height, stride):
-        for x in range(0, image_width, stride):
+    for patch_index, (x, y) in enumerate(patches_coords, 1):
 
-            image_patch = image_padded[y:y + patch_size, x:x + patch_size]
-            label_patch = label_padded[y:y + patch_size, x:x + patch_size]
+        image_patch = image_padded[y:y + patch_size, x:x + patch_size]
+        label_patch = label_padded[y:y + patch_size, x:x + patch_size]
 
-            if image_patch.shape[0] == patch_size and image_patch.shape[1] == patch_size and label_patch.shape[0] == patch_size and label_patch.shape[1] == patch_size:
+        assert image_patch.shape[0] == patch_size
+        assert image_patch.shape[1] == patch_size
 
-                assert image_patch.shape[0] == patch_size
-                assert image_patch.shape[1] == patch_size
+        assert label_patch.shape[0] == patch_size
+        assert label_patch.shape[1] == patch_size
 
-                assert label_patch.shape[0] == patch_size
-                assert label_patch.shape[1] == patch_size
+        image_patch = cv2.cvtColor(np.array(image_patch), cv2.COLOR_BGR2RGB)
+        label_patch = cv2.cvtColor(np.array(label_patch), cv2.COLOR_BGR2RGB)
 
-                image_patch = cv2.cvtColor(np.array(image_patch), cv2.COLOR_BGR2RGB)
-                label_patch = cv2.cvtColor(np.array(label_patch), cv2.COLOR_BGR2RGB)
+        out_image_path = os.path.join(images_dir, "{}_{:04}.png".format(image_filename, patch_index))
+        cv2.imwrite(out_image_path, image_patch)
 
-                out_image_path = os.path.join(images_dir, "{}_{:04}.png".format(image_filename, patch_index))
-                cv2.imwrite(out_image_path, image_patch)
-
-                out_label_path = os.path.join(labels_dir, "{}_{:04}.png".format(label_filename, patch_index))
-                cv2.imwrite(out_label_path, label_patch)
-
-                patch_index += 1
+        out_label_path = os.path.join(labels_dir, "{}_{:04}.png".format(label_filename, patch_index))
+        cv2.imwrite(out_label_path, label_patch)
 
 
 def main():

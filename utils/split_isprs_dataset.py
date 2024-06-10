@@ -128,7 +128,7 @@ def main():
 
     bar = progressbar.ProgressBar(max_value=num_test_images)
     for idx, (img_path, msk_path) in enumerate(zip(test_images_paths, test_labels_paths)):
-        crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, patch_size, False)
+        crop_image_and_label(os.path.join(output_dir, 'test'), img_path, msk_path, patch_size, patch_size, pad)
         bar.update(idx)
     bar.update(num_test_images)
 

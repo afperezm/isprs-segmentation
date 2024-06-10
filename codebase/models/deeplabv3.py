@@ -48,12 +48,12 @@ class DeepLabV3(pl.LightningModule):
         else:
             self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
-        self.criterion = nn.CrossEntropyLoss()
-        self.criterion2 = torchmetrics.Dice(num_classes=num_classes)
-        self.metric1 = MulticlassJaccardIndex(num_classes)
-        self.metric2 = MulticlassPrecision(num_classes)
-        self.metric3 = MulticlassRecall(num_classes)
-        self.metric4 = MulticlassF1Score(num_classes)
+        self.criterion = nn.CrossEntropyLoss(ignore_index=6)
+        self.criterion2 = torchmetrics.Dice(num_classes=num_classes, ignore_index=6)
+        self.metric1 = MulticlassJaccardIndex(num_classes, ignore_index=6)
+        self.metric2 = MulticlassPrecision(num_classes, ignore_index=6)
+        self.metric3 = MulticlassRecall(num_classes, ignore_index=6)
+        self.metric4 = MulticlassF1Score(num_classes, ignore_index=6)
 
     def shared_step(self, batch):
         loss_ce_weight = self.hparams.loss_ce_weight

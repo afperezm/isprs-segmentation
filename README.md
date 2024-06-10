@@ -22,9 +22,9 @@ This is the implementation of the core method of ColorMapGAN, containing a total
 https://www.isprs.org/education/benchmarks/UrbanSemLab/default.aspx
 
 ```bash
-python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Potsdam/2_Ortho_RGB/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-rgb-dataset-256-128/ --patch_size 256 --stride 128 --seed 42
-python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Potsdam/3_Ortho_IRRG/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-irrg-dataset-256-128/ --patch_size 256 --stride 128 --seed 42
-python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-irrg-dataset-256-128/ --patch_size 256 --stride 128 --seed 42
+python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Potsdam/2_Ortho_RGB/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-rgb-dataset-512-256/ --patch_size 512 --stride 256 --seed 42 --pad
+python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Potsdam/3_Ortho_IRRG/ --labels_dir $HOME/data/Potsdam/5_Labels_all/ --output_dir $HOME/data/potsdam-irrg-dataset-512-256/ --patch_size 512 --stride 256 --seed 42 --pad
+python -u utils/split_isprs_dataset.py --images_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen/top/ --labels_dir $HOME/data/Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE/ --output_dir $HOME/data/vaihingen-irrg-dataset-512-256/ --patch_size 512 --stride 256 --seed 42 --pad
 ```
 
 ## Train baseline segmentation models

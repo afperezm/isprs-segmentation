@@ -20,6 +20,7 @@ class ISPRSDataset(Dataset):
         3: [0, 1, 0],  # Tree
         4: [1, 1, 0],  # Car
         5: [1, 0, 0],  # Clutter Background
+        6: [0, 0, 0],  # No Data
     }
 
     def __init__(self, data_dir, is_train=True, transform=None):

@@ -79,6 +79,7 @@ def main():
     elif dataset_name == "isprs":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
+            transforms.ColorJitter(brightness=(0.5, 1.5), saturation=(0.5, 1.5), hue=(-0.1, 0.1)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomVerticalFlip(),
             transforms.RandomCrop((224, 224)),

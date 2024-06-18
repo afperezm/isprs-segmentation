@@ -4,6 +4,7 @@ import os
 import sys
 
 from torch.utils.data import Dataset, DataLoader
+from torchvision.datasets.utils import verify_str_arg
 from torchvision.transforms import transforms
 
 
@@ -11,23 +12,12 @@ class MassRoadsDataset(Dataset):
 
     class_rgb_values = [[0, 0, 0], [255, 255, 255]]
 
-    phase_train = 'train'
-    phase_valid = 'valid'
-    phase_test = 'test'
-
-    def __init__(self, data_dir, is_train=False, is_valid=False, transform=None):
+    def __init__(self, data_dir, split='train', transform=None):
 
         self.data_dir = data_dir
-        self.is_train = is_train
-        self.is_valid = is_valid
         self.transform = transform
 
-        if is_train:
-            self.phase = self.phase_train
-        elif is_valid:
-            self.phase = self.phase_valid
-        else:
-            self.phase = self.phase_test
+        self.phase = verify_str_arg(split, 'split', ('train', 'valid', 'test'))
 
         self.images_dir = os.path.join(self.data_dir, self.phase, 'sat')
         self.labels_dir = os.path.join(self.data_dir, self.phase, 'map')
@@ -57,7 +47,7 @@ if __name__ == "__main__":
 
     root_dir = sys.argv[1]
 
-    dataset = MassRoadsDataset(root_dir, is_train=False, transform=transforms.ToTensor())
+    dataset = MassRoadsDataset(root_dir, split='test', transform=transforms.ToTensor())
     dataloader = DataLoader(dataset, batch_size=4, shuffle=False, num_workers=4)
 
     for batch_idx, batch in enumerate(dataloader):

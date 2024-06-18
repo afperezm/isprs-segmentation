@@ -37,9 +37,7 @@ class MassDataset(Dataset):
         label = cv2.cvtColor(label, cv2.COLOR_BGR2RGB)
 
         if self.transform:
-            image_and_label = np.concatenate([image, label], axis=2)
-            image_and_label = self.transform(image_and_label)
-            image, label = image_and_label[0:3], image_and_label[3:]
+            image = self.transform(image)
 
         return image, label
 

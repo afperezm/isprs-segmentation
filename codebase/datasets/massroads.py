@@ -8,19 +8,20 @@ from torchvision.datasets.utils import verify_str_arg
 from torchvision.transforms import transforms
 
 
-class MassRoadsDataset(Dataset):
+class MassDataset(Dataset):
 
     class_rgb_values = [[0, 0, 0], [255, 255, 255]]
 
-    def __init__(self, data_dir, split='train', transform=None):
+    def __init__(self, data_dir, dataset='roads', split='train', transform=None):
 
         self.data_dir = data_dir
         self.transform = transform
 
+        self.dataset = verify_str_arg(dataset, 'dataset', ('roads', 'buildings'))
         self.phase = verify_str_arg(split, 'split', ('train', 'valid', 'test'))
 
-        self.images_dir = os.path.join(self.data_dir, self.phase, 'sat')
-        self.labels_dir = os.path.join(self.data_dir, self.phase, 'map')
+        self.images_dir = os.path.join(self.data_dir, f'mass_{self.dataset}', self.phase, 'sat')
+        self.labels_dir = os.path.join(self.data_dir, f'mass_{self.dataset}', self.phase, 'map')
 
         self.images_paths = sorted(os.listdir(os.path.join(self.images_dir)))
         self.labels_paths = sorted(os.listdir(os.path.join(self.labels_dir)))
@@ -47,7 +48,7 @@ if __name__ == "__main__":
 
     root_dir = sys.argv[1]
 
-    dataset = MassRoadsDataset(root_dir, split='test', transform=transforms.ToTensor())
+    dataset = MassDataset(root_dir, dataset='roads', split='test', transform=transforms.ToTensor())
     dataloader = DataLoader(dataset, batch_size=4, shuffle=False, num_workers=4)
 
     for batch_idx, batch in enumerate(dataloader):

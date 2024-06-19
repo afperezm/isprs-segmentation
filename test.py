@@ -48,6 +48,7 @@ def main():
         train_dataset = ISPRSDataset(
             data_dir=data_dir[0],
             is_train=is_train,
+            include_names=True,
             transform=transforms.Compose([
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])

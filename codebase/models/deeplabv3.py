@@ -131,6 +131,7 @@ class DeepLabV3(pl.LightningModule):
 
         predictions_array = predictions_image.convert("RGB")
         predictions_tensor = torchvision.transforms.functional.pil_to_tensor(predictions_array)
+        predictions_tensor /= 255
 
         if len(batch) == 4:
             return predictions_tensor, batch[2]

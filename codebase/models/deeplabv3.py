@@ -59,7 +59,7 @@ class DeepLabV3(pl.LightningModule):
         loss_ce_weight = self.hparams.loss_ce_weight
         loss_dice_weight = self.hparams.loss_dice_weight
 
-        images, masks = batch
+        images, masks = batch[0], batch[1]
 
         outputs = self.model(images)['out']
         masks = masks.squeeze(dim=1).long()
@@ -124,7 +124,7 @@ class DeepLabV3(pl.LightningModule):
     def predict_step(self, batch):
         loss, metrics, outputs = self.shared_step(batch)
 
-        predictions = torch.argmax(outputs, dim=1, keepdim=True)
+        predictions = torch.argmax(outputs, dim=1, keepdim=True).squeeze()
 
         predictions_image = Image.fromarray(predictions.byte().cpu().numpy())
         predictions_image.putpalette((255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255))
@@ -132,7 +132,10 @@ class DeepLabV3(pl.LightningModule):
         predictions_array = predictions_image.convert("RGB")
         predictions_tensor = torchvision.transforms.functional.pil_to_tensor(predictions_array)
 
-        return predictions_tensor
+        if len(batch) == 4:
+            return predictions_tensor, batch[2]
+        else:
+            return predictions_tensor
 
     def configure_optimizers(self):
         backbone_learning_rate = self.hparams.backbone_learning_rate

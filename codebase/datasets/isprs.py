@@ -23,11 +23,12 @@ class ISPRSDataset(Dataset):
         6: [0, 0, 0],  # No Data
     }
 
-    def __init__(self, data_dir, is_train=True, transform=None):
+    def __init__(self, data_dir, is_train=True, include_names=False, transform=None):
         super(ISPRSDataset).__init__()
 
         self.data_dir = data_dir
         self.is_train = is_train
+        self.include_names = include_names
         self.transform = transform
 
         if self.is_train:
@@ -73,7 +74,10 @@ class ISPRSDataset(Dataset):
         # Encode labels assuming range was converted from 0..255 to 0..1
         label = self.encode_label(label)
 
-        return image, label
+        if self.include_names:
+            return image, label, self.images_list[index], self.labels_list[index]
+        else:
+            return image, label
 
 
 if __name__ == "__main__":

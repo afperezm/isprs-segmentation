@@ -134,7 +134,7 @@ class DeepLabV3(pl.LightningModule):
         predictions_tensor = predictions_tensor.float() / 255
 
         if len(batch) == 4:
-            return predictions_tensor, batch[2]
+            return predictions_tensor, batch[3]
         else:
             return predictions_tensor
 

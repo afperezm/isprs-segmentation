@@ -121,6 +121,19 @@ class DeepLabV3(pl.LightningModule):
         for metric_key, metric_value in metrics.items():
             self.log(f"test/{metric_key}", metric_value, on_step=False, on_epoch=True)
 
+    def predict_step(self, batch):
+        loss, metrics, outputs = self.shared_step(batch)
+
+        predictions = torch.argmax(outputs, dim=1, keepdim=True)
+
+        predictions_image = Image.fromarray(predictions.byte().cpu().numpy())
+        predictions_image.putpalette((255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255))
+
+        predictions_array = predictions_image.convert("RGB")
+        predictions_tensor = torchvision.transforms.functional.pil_to_tensor(predictions_array)
+
+        return predictions_tensor
+
     def configure_optimizers(self):
         backbone_learning_rate = self.hparams.backbone_learning_rate
         classifier_learning_rate = self.hparams.classifier_learning_rate

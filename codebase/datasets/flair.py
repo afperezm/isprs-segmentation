@@ -12,6 +12,22 @@ from torch.utils.data import Dataset, DataLoader
 
 class FLAIRDataset(Dataset):
 
+    label_mapping = {
+        0: [0, 0, 0],  # Other: Black
+        1: [255, 0, 0],  # Building: Red
+        2: [0, 128, 0],  # Pervious surface: Green
+        3: [0, 0, 255],  # Impervious surface: Blue
+        4: [255, 165, 0],  # Bare soil: Orange
+        5: [128, 0, 128],  # Water: Purple
+        6: [255, 192, 203],  # Coniferous: Pink
+        7: [0, 255, 255],  # Deciduous: Cyan
+        8: [255, 255, 0],  # Brushwood: Yellow
+        9: [75, 0, 130],  # Vine: Indigo
+        10: [165, 42, 42],  # Grassland: Brown
+        11: [255, 20, 147],  # Crop: Deep Pink
+        12: [100, 149, 237]  # Plowed land: Cornflower Blue
+    }
+
     def __init__(
             self,
             data_dir,
@@ -88,6 +104,10 @@ class FLAIRDataset(Dataset):
         enc[d + 1::2] = np.cos(y * freq)
 
         return torch.tensor(enc)
+
+    @property
+    def num_classes(self):
+        return len(self.label_mapping)
 
     def __getitem__(self, i):
 

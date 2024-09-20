@@ -82,7 +82,7 @@ def main():
                 transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
             ])
             valid_batch_size = 4 if batch_size == 1 else batch_size
-    elif dataset_name == "isprs":
+    elif dataset_name == "isprs" or dataset_name == "flair":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.ColorJitter(brightness=(0.5, 1.5), saturation=(0.5, 1.5), hue=(-0.1, 0.1)),

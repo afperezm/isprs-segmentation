@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 
 from codebase.datasets import ISPRSDataset
+from codebase.datasets.flair import FLAIRDataset
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models import ColorMapGAN, DeepLabV3
 from codebase.models.cyclegan import CycleGAN
@@ -54,6 +55,16 @@ def main():
                 transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
             ])
         )
+    elif dataset_name == "flair":
+        train_dataset = FLAIRDataset(data_dir,
+                                     os.path.join(data_dir, 'sub_test_imgs.txt'),
+                                     os.path.join(data_dir, 'sub_test_masks.txt'),
+                                     bands='rgb',
+                                     augmentation=transforms.Compose([
+                                         transforms.ToTensor(),
+                                         transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0],
+                                                              [0.229, 0.224, 0.225, 1, 1, 1])
+                                     ]))
     else:
         raise ValueError("Invalid dataset selection")
 

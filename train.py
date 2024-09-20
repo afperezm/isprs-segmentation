@@ -5,6 +5,7 @@ import torch
 from torchvision import transforms
 
 from codebase.datasets import ISPRSDataset, UnpairedDataset
+from codebase.datasets.flair import FLAIRDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
@@ -57,6 +58,11 @@ def main():
             data_dir=data_dir[0],
             is_train=True
         )
+    elif dataset_name == "flair":
+        train_dataset = FLAIRDataset(data_dir,
+                                     os.path.join(data_dir, 'sub_train_imgs.txt'),
+                                     os.path.join(data_dir, 'sub_train_masks.txt'),
+                                     bands='rgb')
     else:
         raise ValueError("Invalid dataset selection")
 

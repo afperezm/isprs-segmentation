@@ -188,7 +188,7 @@ def parse_args():
     parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=[0.0, 0.0])
     parser.add_argument("--lambdas", help="Losses weights", type=float, nargs="+", default=[1.0, 0.0])
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
-                        choices=["unpaired", "unpaired-pastis", "isprs"], required=True)
+                        choices=["unpaired", "unpaired-pastis", "isprs", "flair"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--valid_size", help="Validation dataset size", type=float, default=0.2)

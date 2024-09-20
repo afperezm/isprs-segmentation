@@ -129,7 +129,7 @@ def parse_args():
     parser.add_argument("--output_dir", help="Output directory")
     parser.add_argument("--ckpt_path", help="Checkpoint path", required=True)
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
-                        choices=["unpaired", "isprs"], required=True)
+                        choices=["unpaired", "isprs", "flair"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")

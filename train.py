@@ -59,9 +59,9 @@ def main():
             is_train=True
         )
     elif dataset_name == "flair":
-        train_dataset = FLAIRDataset(data_dir,
-                                     os.path.join(data_dir, 'sub_train_imgs.txt'),
-                                     os.path.join(data_dir, 'sub_train_masks.txt'),
+        train_dataset = FLAIRDataset(data_dir[0],
+                                     os.path.join(data_dir[0], 'sub_train_imgs.txt'),
+                                     os.path.join(data_dir[0], 'sub_train_masks.txt'),
                                      bands='rgb')
     else:
         raise ValueError("Invalid dataset selection")

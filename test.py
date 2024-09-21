@@ -62,7 +62,7 @@ def main():
                                      os.path.join(data_dir, 'sub_test_imgs.txt'),
                                      os.path.join(data_dir, 'sub_test_masks.txt'),
                                      bands='rgb',
-                                     augmentation=val_trans)
+                                     transform=val_trans)
     else:
         raise ValueError("Invalid dataset selection")
 

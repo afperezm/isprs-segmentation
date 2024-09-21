@@ -36,7 +36,7 @@ class FLAIRDataset(Dataset):
             images_txt,
             masks_txt,
             bands='rgbirh',
-            augmentation=None,
+            transform=None,
             crop_size=None,
             geo_info=None,
             stage='train'
@@ -52,7 +52,7 @@ class FLAIRDataset(Dataset):
 
         self.data_dir = data_dir
         self.bands = bands
-        self.augmentation = augmentation
+        self.transform = transform
         self.crop_size = crop_size
         self.geo_info = geo_info
         self.stage = stage
@@ -133,8 +133,8 @@ class FLAIRDataset(Dataset):
             image, mask = self.random_crop(image, mask)
 
         # apply augmentations
-        if self.augmentation:
-            pair = self.augmentation(image=image, mask=mask)
+        if self.transform:
+            pair = self.transform(image=image, mask=mask)
             image, mask = pair['image'], pair['mask']
 
         if self.geo_info:

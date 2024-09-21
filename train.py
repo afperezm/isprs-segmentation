@@ -100,13 +100,11 @@ def main():
         ])
         valid_batch_size = batch_size
     elif dataset_name == "flair":
-        train_trans = choose_training_augmentations(mean=[0.485, 0.456, 0.406],
-                                                    std=[0.229, 0.224, 0.225], aug_type='randaugment')
-        val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
-        train_dataset.dataset.augmentation = train_trans
-        valid_dataset.dataset.augmentation = val_trans
-
+        train_dataset.dataset.transform = choose_training_augmentations(mean=[0.485, 0.456, 0.406],
+                                                                        std=[0.229, 0.224, 0.225],
+                                                                        aug_type='randaugment')
+        valid_dataset.dataset.transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406],
+                                                                       std=[0.229, 0.224, 0.225])
         valid_batch_size = batch_size
     else:
         raise ValueError("Invalid dataset selection")

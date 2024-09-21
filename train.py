@@ -106,6 +106,8 @@ def main():
 
         train_dataset.dataset.transform = train_trans
         valid_dataset.dataset.transform = val_trans
+
+        valid_batch_size = batch_size
     else:
         raise ValueError("Invalid dataset selection")
 

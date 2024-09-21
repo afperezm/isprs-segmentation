@@ -13,6 +13,8 @@ class ISPRSDataset(Dataset):
     phase_train = 'train'
     phase_test = 'test'
 
+    ignore_index = 6
+
     label_mapping = {
         0: [1, 1, 1],  # Impervious surfaces
         1: [0, 0, 1],  # Building

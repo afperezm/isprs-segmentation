@@ -7,7 +7,7 @@ from torchvision import transforms
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
@@ -79,11 +79,11 @@ def main():
         ])
         valid_batch_size = 4 if batch_size == 1 else batch_size
     elif dataset_name == "unpaired-pastis":
-            train_dataset.dataset.transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
-            ])
-            valid_batch_size = 4 if batch_size == 1 else batch_size
+        train_dataset.dataset.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+        ])
+        valid_batch_size = 4 if batch_size == 1 else batch_size
     elif dataset_name == "isprs":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
@@ -153,6 +153,7 @@ def main():
         backbone = "resnet50" if len(model_name.split('-')) == 1 else "resnet101"
         if ckpt_path and not resume:
             model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.dataset.num_classes,
+                                                   ignore_index=train_dataset.dataset.ignore_index,
                                                    backbone=backbone,
                                                    loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                                                    backbone_learning_rate=learning_rate[0],
@@ -164,6 +165,7 @@ def main():
                                                    scheduler_threshold=scheduler_threshold)
         else:
             model = DeepLabV3(num_classes=train_dataset.dataset.num_classes, backbone=backbone,
+                              ignore_index=train_dataset.dataset.ignore_index,
                               loss_ce_weight=lambdas[0], loss_dice_weight=lambdas[1],
                               backbone_learning_rate=learning_rate[0], classifier_learning_rate=learning_rate[1],
                               backbone_weight_decay=weight_decay[0], classifier_weight_decay=weight_decay[1],

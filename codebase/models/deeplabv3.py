@@ -6,7 +6,7 @@ import torchvision
 from PIL import Image
 
 from torch import nn, optim
-from torchmetrics.classification import MulticlassJaccardIndex, MulticlassPrecision, MulticlassRecall, MulticlassF1Score
+from torchmetrics.classification import JaccardIndex, Precision, Recall, F1Score
 from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV3_ResNet101_Weights, \
     DeepLabV3_MobileNet_V3_Large_Weights
 
@@ -24,7 +24,7 @@ def make_decoded_grid(tensor):
 
 
 class DeepLabV3(pl.LightningModule):
-    def __init__(self, num_classes, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
+    def __init__(self, num_classes, ignore_index, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
                  backbone_learning_rate=0.00005, classifier_learning_rate=0.00005,
                  backbone_weight_decay=0.0, classifier_weight_decay=0.0, **kwargs):
         super(DeepLabV3, self).__init__()
@@ -48,12 +48,12 @@ class DeepLabV3(pl.LightningModule):
         else:
             self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
 
-        self.criterion = nn.CrossEntropyLoss(ignore_index=6)
-        self.criterion2 = torchmetrics.Dice(num_classes=num_classes, ignore_index=6)
-        self.metric1 = MulticlassJaccardIndex(num_classes, ignore_index=6)
-        self.metric2 = MulticlassPrecision(num_classes, ignore_index=6)
-        self.metric3 = MulticlassRecall(num_classes, ignore_index=6)
-        self.metric4 = MulticlassF1Score(num_classes, ignore_index=6)
+        self.criterion = nn.CrossEntropyLoss(ignore_index=ignore_index)
+        self.criterion2 = torchmetrics.Dice(num_classes=num_classes, ignore_index=ignore_index)
+        self.metric1 = JaccardIndex(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
+        self.metric2 = Precision(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
+        self.metric3 = Recall(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
+        self.metric4 = F1Score(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
 
     def shared_step(self, batch):
         loss_ce_weight = self.hparams.loss_ce_weight

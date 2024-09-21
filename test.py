@@ -13,6 +13,7 @@ from codebase.datasets.flair import FLAIRDataset
 from codebase.datasets.unpaired import UnpairedDataset
 from codebase.models import ColorMapGAN, DeepLabV3
 from codebase.models.cyclegan import CycleGAN
+from codebase.utils.augmentation import get_validation_augmentations
 
 PARAMS = None
 
@@ -56,15 +57,12 @@ def main():
             ])
         )
     elif dataset_name == "flair":
+        val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         train_dataset = FLAIRDataset(data_dir,
                                      os.path.join(data_dir, 'sub_test_imgs.txt'),
                                      os.path.join(data_dir, 'sub_test_masks.txt'),
                                      bands='rgb',
-                                     augmentation=transforms.Compose([
-                                         transforms.ToTensor(),
-                                         transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0],
-                                                              [0.229, 0.224, 0.225, 1, 1, 1])
-                                     ]))
+                                     augmentation=val_trans)
     else:
         raise ValueError("Invalid dataset selection")
 

@@ -12,6 +12,8 @@ from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
 
+from codebase.utils.augmentation import choose_training_augmentations, get_validation_augmentations
+
 
 def main():
     data_dir = PARAMS.data_dir
@@ -82,7 +84,7 @@ def main():
                 transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
             ])
             valid_batch_size = 4 if batch_size == 1 else batch_size
-    elif dataset_name == "isprs" or dataset_name == "flair":
+    elif dataset_name == "isprs":
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.ColorJitter(brightness=(0.5, 1.5), saturation=(0.5, 1.5), hue=(-0.1, 0.1)),
@@ -97,6 +99,13 @@ def main():
             transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
         ])
         valid_batch_size = batch_size
+    elif dataset_name == "flair":
+        train_trans = choose_training_augmentations(mean=[0.485, 0.456, 0.406],
+                                                    std=[0.229, 0.224, 0.225], aug_type='randaugment')
+        val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
+        train_dataset.dataset.transform = train_trans
+        valid_dataset.dataset.transform = val_trans
     else:
         raise ValueError("Invalid dataset selection")
 

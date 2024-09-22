@@ -111,6 +111,11 @@ class FLAIRDataset(Dataset):
     def num_classes(self):
         return len(self.label_mapping)
 
+    @property
+    def labels_palette(self):
+        palette = [item for index, sublist in self.label_mapping.items() if index != self.ignore_index for item in sublist]
+        return tuple(palette)
+
     def __getitem__(self, i):
 
         # read data

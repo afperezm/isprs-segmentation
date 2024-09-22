@@ -11,11 +11,12 @@ from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV
     DeepLabV3_MobileNet_V3_Large_Weights
 
 
-def make_decoded_grid(tensor):
+def make_decoded_grid(tensor, palette):
+
     grid = torchvision.utils.make_grid(tensor)[0]
 
     grid_image = Image.fromarray(grid.byte().cpu().numpy())
-    grid_image.putpalette((255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255))
+    grid_image.putpalette(palette)
 
     grid_array = grid_image.convert("RGB")
     grid_tensor = torchvision.transforms.functional.pil_to_tensor(grid_array)
@@ -24,7 +25,7 @@ def make_decoded_grid(tensor):
 
 
 class DeepLabV3(pl.LightningModule):
-    def __init__(self, num_classes, ignore_index, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
+    def __init__(self, num_classes, ignore_index, labels_palette, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
                  backbone_learning_rate=0.00005, classifier_learning_rate=0.00005,
                  backbone_weight_decay=0.0, classifier_weight_decay=0.0, **kwargs):
         super(DeepLabV3, self).__init__()
@@ -47,6 +48,8 @@ class DeepLabV3(pl.LightningModule):
             self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(960, num_classes)
         else:
             self.model.classifier = torchvision.models.segmentation.deeplabv3.DeepLabHead(2048, num_classes)
+
+        self.labels_palette = labels_palette
 
         self.criterion = nn.CrossEntropyLoss(ignore_index=ignore_index)
         self.criterion2 = torchmetrics.Dice(num_classes=num_classes, ignore_index=ignore_index)
@@ -105,10 +108,10 @@ class DeepLabV3(pl.LightningModule):
             grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
             tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
 
-            grid = make_decoded_grid(masks)
+            grid = make_decoded_grid(masks, self.labels_palette)
             tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
 
-            grid = make_decoded_grid(predictions)
+            grid = make_decoded_grid(predictions, self.labels_palette)
             tensorboard.add_image(tag="valid/predictions", img_tensor=grid, global_step=current_epoch)
 
         return loss
@@ -127,7 +130,7 @@ class DeepLabV3(pl.LightningModule):
         predictions = torch.argmax(outputs, dim=1, keepdim=True).squeeze()
 
         predictions_image = Image.fromarray(predictions.byte().cpu().numpy())
-        predictions_image.putpalette((255, 255, 255, 255, 0, 0, 255, 255, 0, 0, 255, 0, 0, 255, 255, 0, 0, 255))
+        predictions_image.putpalette(self.labels_palette)
 
         predictions_array = predictions_image.convert("RGB")
         predictions_tensor = torchvision.transforms.functional.pil_to_tensor(predictions_array)

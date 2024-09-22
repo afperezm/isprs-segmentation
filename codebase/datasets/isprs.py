@@ -50,6 +50,12 @@ class ISPRSDataset(Dataset):
     def num_classes(self):
         return len(self.label_mapping)
 
+    @property
+    def labels_palette(self):
+        palette = [item for index, sublist in self.label_mapping.items() if index != self.ignore_index for item in sublist]
+        palette = [255 if item == 1 else item for item in palette]
+        return tuple(palette)
+
     def encode_label(self, label_tensor):
         label_encoded = torch.zeros((label_tensor.shape[1], label_tensor.shape[2]), dtype=torch.uint8)
         for index, color in self.label_mapping.items():

@@ -1,3 +1,7 @@
+"""
+Based on https://github.com/VMarsocci/geomultitasknet
+"""
+
 import torch
 import torch.nn as nn
 import numpy as np

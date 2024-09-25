@@ -1,3 +1,7 @@
+"""
+Based on https://github.com/VMarsocci/geomultitasknet
+"""
+
 import albumentations as A
 import numpy as np
 

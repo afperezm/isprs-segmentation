@@ -85,7 +85,7 @@ if __name__ == "__main__":
 
     data_module = FLAIRDataModule(root_dir, batch_size=32, num_workers=8)
 
-    data_module.setup()
+    data_module.setup(stage='fit')
 
     valid_dataloader = data_module.val_dataloader()
 

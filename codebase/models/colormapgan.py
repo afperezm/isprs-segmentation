@@ -52,22 +52,23 @@ class ColorMapGAN(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx, dataloader_idx=0):
 
-        source_images, target_images = batch
+        target_images = batch[0]
 
         target_images_adapted = self.generator(target_images)
         pred_target_images_adapted = self.discriminator(target_images_adapted)
 
         g_loss = self.mse_loss(pred_target_images_adapted, torch.ones_like(pred_target_images_adapted))
 
-        pred_real_source_images = self.discriminator(source_images)
+        # pred_real_source_images = self.discriminator(source_images)
         pred_fake_source_images = self.discriminator(target_images_adapted)
 
-        real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
+        # real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
         fake_loss = self.mse_loss(pred_fake_source_images, torch.zeros_like(pred_fake_source_images))
 
-        d_loss = 0.5 * (real_loss + fake_loss)
+        # d_loss = 0.5 * (real_loss + fake_loss)
 
-        self.log_dict({"valid/g_loss": g_loss, "valid/d_loss": d_loss}, prog_bar=True)
+        # self.log_dict({"valid/g_loss": g_loss, "valid/d_loss": d_loss}, prog_bar=True)
+        self.log_dict({"valid/g_loss": g_loss}, prog_bar=True)
 
         if batch_idx == 0:
 
@@ -77,8 +78,8 @@ class ColorMapGAN(pl.LightningModule):
 
             print(f'current_epoch={current_epoch} global_step={global_step}')
 
-            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
-            tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
+            # grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
+            # tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
 
             grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
             tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)

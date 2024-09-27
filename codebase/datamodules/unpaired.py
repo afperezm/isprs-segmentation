@@ -29,29 +29,35 @@ class FLAIRDataModule(pl.LightningDataModule):
         self.target_dataset = None
 
     def setup(self, stage=None):
-        source_dataset = FLAIRDataset(self.data_dir,
-                                      os.path.join(self.data_dir, 'sub_train_imgs.txt'),
-                                      os.path.join(self.data_dir, 'sub_train_masks.txt'),
-                                      bands='rgb')
+        if stage in ('fit', 'validate'):
+            source_dataset = FLAIRDataset(self.data_dir,
+                                          os.path.join(self.data_dir, 'sub_train_imgs.txt'),
+                                          os.path.join(self.data_dir, 'sub_train_masks.txt'),
+                                          bands='rgb')
 
-        source_valid_size = 4
-        source_train_size = len(source_dataset) - source_valid_size
+            source_valid_size = 4
+            source_train_size = len(source_dataset) - source_valid_size
 
-        self.source_train_dataset, self.source_valid_dataset = random_split(source_dataset,
-                                                                            [source_train_size, source_valid_size],
-                                                                            generator=self.generator)
+            self.source_train_dataset, self.source_valid_dataset = random_split(source_dataset,
+                                                                                [source_train_size, source_valid_size],
+                                                                                generator=self.generator)
 
-        target_dataset = FLAIRDataset(self.data_dir,
-                                      os.path.join(self.data_dir, 'sub_test_imgs.txt'),
-                                      os.path.join(self.data_dir, 'sub_test_masks.txt'),
-                                      bands='rgb')
+            target_dataset = FLAIRDataset(self.data_dir,
+                                          os.path.join(self.data_dir, 'sub_test_imgs.txt'),
+                                          os.path.join(self.data_dir, 'sub_test_masks.txt'),
+                                          bands='rgb')
 
-        target_valid_size = 4
-        target_train_size = len(target_dataset) - target_valid_size
+            target_valid_size = 4
+            target_train_size = len(target_dataset) - target_valid_size
 
-        self.target_train_dataset, self.target_valid_dataset = random_split(target_dataset,
-                                                                            [target_train_size, target_valid_size],
-                                                                            generator=self.generator)
+            self.target_train_dataset, self.target_valid_dataset = random_split(target_dataset,
+                                                                                [target_train_size, target_valid_size],
+                                                                                generator=self.generator)
+        elif stage == 'predict':
+            self.target_dataset = FLAIRDataset(self.data_dir,
+                                               os.path.join(self.data_dir, 'sub_test_imgs.txt'),
+                                               os.path.join(self.data_dir, 'sub_test_masks.txt'),
+                                               bands='rgb')
 
     def train_dataloader(self):
         return {
@@ -72,10 +78,8 @@ class FLAIRDataModule(pl.LightningDataModule):
         }
 
     def predict_dataloader(self):
-        target_dataset = ConcatDataset([self.target_train_dataset, self.target_valid_dataset])
-
-        return DataLoader(target_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
-                          shuffle=True, generator=self.generator)
+        return DataLoader(self.target_dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True,
+                          generator=self.generator)
 
 
 if __name__ == "__main__":

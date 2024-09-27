@@ -80,3 +80,7 @@ python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset-256-128/ $HOME/da
 python -u train.py --data_dir $HOME/data/flair-dataset/ --results_dir ./results/flair/ --epochs 50 --batch_size 8 --learning_rate 0.0001 0.0001 --model deeplabv3 --dataset flair --comment "Train DeepLabV3 segmentation model with ResNet-50 backbone on FLAIR RGB images of of size 512x512" &> ~/logs/deeplabv3_flair-rgb.log &
 python -u test.py --data_dir $HOME/data/flair-dataset/ --output_dir ./submits/ --ckpt_path ./results/flair/deeplabv3-240921-024416/checkpoints/epoch=23-step=38520.ckpt --dataset flair --model deeplabv3 --enable_progress_bar --test_only
 ```
+
+```bash
+python -u train.py --data_dir $HOME/data/flair-dataset/ --results_dir ./results/flair/ --epochs 10 --batch_size 32 --learning_rate 0.00005 0.00001 --dataset unpaired-flair --model colormapgan --comment "FLAIR test subset to FLAIR train subset"
+```

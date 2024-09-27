@@ -50,7 +50,7 @@ class ColorMapGAN(pl.LightningModule):
 
         self.log_dict({"train/g_loss": g_loss, "train/d_loss": d_loss}, prog_bar=True)
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx, dataloader_idx=0):
 
         source_images, target_images = batch
 

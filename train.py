@@ -137,7 +137,7 @@ def main():
                                       generator=generator)
     elif dataset_name == "unpaired-flair":
         data_module = FLAIRDataModule(data_dir[0], batch_size=batch_size, num_workers=8, generator=generator)
-        data_module.setup()
+        data_module.setup(stage='fit')
         train_dataloader = data_module.train_dataloader()
         valid_dataloader = data_module.val_dataloader()
     else:

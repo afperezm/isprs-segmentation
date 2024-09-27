@@ -5,7 +5,7 @@ import pytorch_lightning as pl
 import torch
 
 from codebase.datasets.flair import FLAIRDataset
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split, ConcatDataset
 
 
 class FLAIRDataModule(pl.LightningDataModule):
@@ -20,34 +20,62 @@ class FLAIRDataModule(pl.LightningDataModule):
         else:
             self.generator = torch.Generator().manual_seed(42)
 
-        self.source_dataset = None
+        self.source_train_dataset = None
+        self.source_valid_dataset = None
+
+        self.target_train_dataset = None
+        self.target_valid_dataset = None
+
         self.target_dataset = None
 
     def setup(self, stage=None):
-        self.source_dataset = FLAIRDataset(self.data_dir,
-                                           os.path.join(self.data_dir, 'sub_train_imgs.txt'),
-                                           os.path.join(self.data_dir, 'sub_train_masks.txt'),
-                                           bands='rgb')
-        self.target_dataset = FLAIRDataset(self.data_dir,
-                                           os.path.join(self.data_dir, 'sub_test_imgs.txt'),
-                                           os.path.join(self.data_dir, 'sub_test_masks.txt'),
-                                           bands='rgb')
+        source_dataset = FLAIRDataset(self.data_dir,
+                                      os.path.join(self.data_dir, 'sub_train_imgs.txt'),
+                                      os.path.join(self.data_dir, 'sub_train_masks.txt'),
+                                      bands='rgb')
+
+        source_valid_size = 4
+        source_train_size = len(source_dataset) - source_valid_size
+
+        self.source_train_dataset, self.source_valid_dataset = random_split(source_dataset,
+                                                                            [source_train_size, source_valid_size],
+                                                                            generator=self.generator)
+
+        target_dataset = FLAIRDataset(self.data_dir,
+                                      os.path.join(self.data_dir, 'sub_test_imgs.txt'),
+                                      os.path.join(self.data_dir, 'sub_test_masks.txt'),
+                                      bands='rgb')
+
+        target_valid_size = 4
+        target_train_size = len(target_dataset) - target_valid_size
+
+        self.target_train_dataset, self.target_valid_dataset = random_split(target_dataset,
+                                                                            [target_train_size, target_valid_size],
+                                                                            generator=self.generator)
 
     def train_dataloader(self):
         return {
-            'source': DataLoader(self.source_dataset, batch_size=self.batch_size, num_workers=self.num_workers // 2,
+            'source': DataLoader(self.source_train_dataset, batch_size=self.batch_size,
+                                 num_workers=self.num_workers // 2,
                                  shuffle=True, generator=self.generator),
-            'target': DataLoader(self.target_dataset, batch_size=self.batch_size, num_workers=self.num_workers // 2,
+            'target': DataLoader(self.target_train_dataset, batch_size=self.batch_size,
+                                 num_workers=self.num_workers // 2,
                                  shuffle=True, generator=self.generator)
         }
 
     def val_dataloader(self):
-        return DataLoader(self.target_dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True,
-                          generator=self.generator)
+        return {
+            'source': DataLoader(self.source_valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
+                                 shuffle=True, generator=self.generator),
+            'target': DataLoader(self.target_valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
+                                 shuffle=True, generator=self.generator)
+        }
 
-    def test_dataloader(self):
-        return DataLoader(self.target_dataset, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True,
-                          generator=self.generator)
+    def predict_dataloader(self):
+        target_dataset = ConcatDataset([self.target_train_dataset, self.target_valid_dataset])
+
+        return DataLoader(target_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
+                          shuffle=True, generator=self.generator)
 
 
 if __name__ == "__main__":

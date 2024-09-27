@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 import torch
 from torchvision import transforms
 
+from codebase.datamodules.unpaired import FLAIRDataModule
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
@@ -49,42 +50,53 @@ def main():
 
     generator = torch.Generator().manual_seed(seed)
 
-    if dataset_name == "unpaired" or dataset_name == "unpaired-pastis":
+    if dataset_name == "unpaired":
         train_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
             is_train=True
         )
-    elif dataset_name == "isprs":
-        train_dataset = ISPRSDataset(
-            data_dir=data_dir[0],
-            is_train=True
-        )
-    elif dataset_name == "flair":
-        train_dataset = FLAIRDataset(data_dir[0],
-                                     os.path.join(data_dir[0], 'sub_train_imgs.txt'),
-                                     os.path.join(data_dir[0], 'sub_train_masks.txt'),
-                                     bands='rgb')
-    else:
-        raise ValueError("Invalid dataset selection")
-
-    # Split training dataset
-    train_size = 1.0 - valid_size
-    train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
-
-    if dataset_name == "unpaired":
+        # Split training dataset
+        train_size = 1.0 - valid_size
+        train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
+        # Assign training transform
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
         ])
         valid_batch_size = 4 if batch_size == 1 else batch_size
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
+                                      generator=generator)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=valid_batch_size, shuffle=False, num_workers=8,
+                                      generator=generator)
     elif dataset_name == "unpaired-pastis":
+        train_dataset = UnpairedDataset(
+            source_dir=data_dir[0],
+            target_dir=data_dir[1],
+            is_train=True
+        )
+        # Split training dataset
+        train_size = 1.0 - valid_size
+        train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
+        # Assign training transform
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
         ])
         valid_batch_size = 4 if batch_size == 1 else batch_size
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
+                                      generator=generator)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=valid_batch_size, shuffle=False, num_workers=8,
+                                      generator=generator)
     elif dataset_name == "isprs":
+        train_dataset = ISPRSDataset(
+            data_dir=data_dir[0],
+            is_train=True
+        )
+        # Split training dataset
+        train_size = 1.0 - valid_size
+        train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
+        # Assign training transform
         train_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.ColorJitter(brightness=(0.5, 1.5), saturation=(0.5, 1.5), hue=(-0.1, 0.1)),
@@ -93,37 +105,43 @@ def main():
             transforms.RandomCrop((224, 224)),
             transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
         ])
-
+        # Assign validation transform
         valid_dataset.dataset.transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
         ])
         valid_batch_size = batch_size
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
+                                      generator=generator)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=valid_batch_size, shuffle=False, num_workers=8,
+                                      generator=generator)
     elif dataset_name == "flair":
+        train_dataset = FLAIRDataset(data_dir[0],
+                                     os.path.join(data_dir[0], 'sub_train_imgs.txt'),
+                                     os.path.join(data_dir[0], 'sub_train_masks.txt'),
+                                     bands='rgb')
+        # Split training dataset
+        train_size = 1.0 - valid_size
+        train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
+        # Assign training transform
         train_dataset.dataset.transform = choose_training_augmentations(mean=[0.485, 0.456, 0.406],
                                                                         std=[0.229, 0.224, 0.225],
                                                                         aug_type='randaugment')
+        # Assign validation transform
         valid_dataset.dataset.transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406],
                                                                        std=[0.229, 0.224, 0.225])
         valid_batch_size = batch_size
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
+                                      generator=generator)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=valid_batch_size, shuffle=False, num_workers=8,
+                                      generator=generator)
+    elif dataset_name == "unpaired-flair":
+        data_module = FLAIRDataModule(data_dir[0], batch_size=batch_size, num_workers=8, generator=generator)
+        data_module.setup()
+        train_dataloader = data_module.train_dataloader()
+        valid_dataloader = data_module.val_dataloader()
     else:
         raise ValueError("Invalid dataset selection")
-
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=8,
-        generator=generator
-    )
-
-    valid_dataloader = DataLoader(
-        valid_dataset,
-        batch_size=valid_batch_size,
-        shuffle=False,
-        num_workers=8,
-        generator=generator
-    )
 
     # Initialize logger
     tb_logger = TensorBoardLogger(save_dir=results_dir_root, name=results_dir_name, version=exp_name,
@@ -201,7 +219,7 @@ def parse_args():
     parser.add_argument("--weight_decay", help="Weight_decay", nargs='+', type=float, default=[0.0, 0.0])
     parser.add_argument("--lambdas", help="Losses weights", type=float, nargs="+", default=[1.0, 0.0])
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
-                        choices=["unpaired", "unpaired-pastis", "isprs", "flair"], required=True)
+                        choices=["unpaired", "unpaired-pastis", "isprs", "flair", "unpaired-flair"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--valid_size", help="Validation dataset size", type=float, default=0.2)

@@ -5,7 +5,9 @@ import pytorch_lightning as pl
 import torch
 
 from codebase.datasets.flair import FLAIRDataset
-from torch.utils.data import DataLoader, random_split, ConcatDataset
+from torch.utils.data import DataLoader, random_split
+
+from codebase.utils.augmentation import get_validation_augmentations
 
 
 class FLAIRDataModule(pl.LightningDataModule):
@@ -29,11 +31,14 @@ class FLAIRDataModule(pl.LightningDataModule):
         self.target_dataset = None
 
     def setup(self, stage=None):
+        transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406],
+                                                 std=[0.229, 0.224, 0.225])
         if stage in ('fit', 'validate'):
             source_dataset = FLAIRDataset(self.data_dir,
                                           os.path.join(self.data_dir, 'sub_train_imgs.txt'),
                                           os.path.join(self.data_dir, 'sub_train_masks.txt'),
-                                          bands='rgb')
+                                          bands='rgb',
+                                          transform=transform)
 
             source_valid_size = 4
             source_train_size = len(source_dataset) - source_valid_size
@@ -45,7 +50,8 @@ class FLAIRDataModule(pl.LightningDataModule):
             target_dataset = FLAIRDataset(self.data_dir,
                                           os.path.join(self.data_dir, 'sub_test_imgs.txt'),
                                           os.path.join(self.data_dir, 'sub_test_masks.txt'),
-                                          bands='rgb')
+                                          bands='rgb',
+                                          transform=transform)
 
             target_valid_size = 4
             target_train_size = len(target_dataset) - target_valid_size
@@ -57,7 +63,8 @@ class FLAIRDataModule(pl.LightningDataModule):
             self.target_dataset = FLAIRDataset(self.data_dir,
                                                os.path.join(self.data_dir, 'sub_test_imgs.txt'),
                                                os.path.join(self.data_dir, 'sub_test_masks.txt'),
-                                               bands='rgb')
+                                               bands='rgb',
+                                               transform=transform)
 
     def train_dataloader(self):
         return {

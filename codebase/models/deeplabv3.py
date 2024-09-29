@@ -108,6 +108,7 @@ class DeepLabV3(pl.LightningModule):
             grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
             tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
 
+            masks = torch.unsqueeze(masks, 1)
             grid = make_decoded_grid(masks, self.labels_palette)
             tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
 

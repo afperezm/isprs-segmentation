@@ -26,9 +26,9 @@ class ColorMapGAN(pl.LightningModule):
 
         # Train generator
         self.toggle_optimizer(optimizer_g)
-        fake_source_images = self.generator(target_images)
-        pred_fake_source_images = self.discriminator(fake_source_images)
-        g_loss = self.mse_loss(pred_fake_source_images, torch.ones_like(pred_fake_source_images))
+        fake_target_images = self.generator(source_images)
+        pred_fake_target_images = self.discriminator(fake_target_images)
+        g_loss = self.mse_loss(pred_fake_target_images, torch.ones_like(pred_fake_target_images))
         optimizer_g.zero_grad()
         self.manual_backward(g_loss)
         optimizer_g.step()
@@ -37,11 +37,11 @@ class ColorMapGAN(pl.LightningModule):
         # Train discriminator
         self.toggle_optimizer(optimizer_d)
         # how well can it label as real?
-        pred_real_source_images = self.discriminator(source_images)
-        real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
+        pred_real_target_images = self.discriminator(target_images)
+        real_loss = self.mse_loss(pred_real_target_images, torch.ones_like(pred_real_target_images))
         # how well can it label as fake?
-        pred_fake_source_images = self.discriminator(fake_source_images.detach())
-        fake_loss = self.mse_loss(pred_fake_source_images, torch.zeros_like(pred_fake_source_images))
+        pred_fake_target_images = self.discriminator(fake_target_images.detach())
+        fake_loss = self.mse_loss(pred_fake_target_images, torch.zeros_like(pred_fake_target_images))
         d_loss = 0.5 * (real_loss + fake_loss)
         optimizer_d.zero_grad()
         self.manual_backward(d_loss)
@@ -52,15 +52,15 @@ class ColorMapGAN(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx, dataloader_idx=0):
 
-        target_images = batch[0]
+        source_images = batch[0]
 
-        target_images_adapted = self.generator(target_images)
-        pred_target_images_adapted = self.discriminator(target_images_adapted)
+        source_images_adapted = self.generator(source_images)
+        pred_source_images_adapted = self.discriminator(source_images_adapted)
 
-        g_loss = self.mse_loss(pred_target_images_adapted, torch.ones_like(pred_target_images_adapted))
+        g_loss = self.mse_loss(pred_source_images_adapted, torch.ones_like(pred_source_images_adapted))
 
         # pred_real_source_images = self.discriminator(source_images)
-        pred_fake_source_images = self.discriminator(target_images_adapted)
+        # pred_fake_source_images = self.discriminator(target_images_adapted)
 
         # real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
         # fake_loss = self.mse_loss(pred_fake_source_images, torch.zeros_like(pred_fake_source_images))
@@ -81,22 +81,22 @@ class ColorMapGAN(pl.LightningModule):
             # grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
             # tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
 
-            grid = torchvision.utils.make_grid(target_images, normalize=True, value_range=(-1, 1))
-            tensorboard.add_image(tag="valid/target_images", img_tensor=grid, global_step=current_epoch)
+            grid = torchvision.utils.make_grid(source_images, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/source_images", img_tensor=grid, global_step=current_epoch)
 
-            grid = torchvision.utils.make_grid(target_images_adapted, normalize=True, value_range=(-1, 1))
-            tensorboard.add_image(tag="valid/target_images_adapted", img_tensor=grid, global_step=current_epoch)
+            grid = torchvision.utils.make_grid(source_images_adapted, normalize=True, value_range=(-1, 1))
+            tensorboard.add_image(tag="valid/source_images_adapted", img_tensor=grid, global_step=current_epoch)
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         source_images, target_images = batch[0], batch[1]
 
-        target_images_adapted = self.generator(target_images)
-        target_images_adapted = (target_images_adapted + 1.0) / 2.0
+        source_images_adapted = self.generator(source_images)
+        source_images_adapted = (source_images_adapted + 1.0) / 2.0
 
         if len(batch) == 4:
-            return target_images_adapted, batch[3]
+            return source_images_adapted, batch[3]
         else:
-            return target_images_adapted
+            return source_images_adapted
 
     def configure_optimizers(self):
         lr_gen = self.hparams.lr_gen

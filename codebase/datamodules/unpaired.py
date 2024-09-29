@@ -31,8 +31,8 @@ class FLAIRDataModule(pl.LightningDataModule):
         self.target_dataset = None
 
     def setup(self, stage=None):
-        transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406],
-                                                 std=[0.229, 0.224, 0.225])
+        transform = get_validation_augmentations(mean=[127.5, 127.5, 127.5],
+                                                 std=[127.5, 127.5, 127.5])
         if stage in ('fit', 'validate'):
             source_dataset = FLAIRDataset(self.data_dir,
                                           os.path.join(self.data_dir, 'sub_train_imgs.txt'),

@@ -14,6 +14,9 @@ class ColorMapGenerator(nn.Module):
         nn.init.zeros_(self.bias)
 
     def forward(self, img):
+
+        assert torch.all(img >= -1) and torch.all(img <= 1), "Values are not in the range [-1, 1]"
+
         img = torch.transpose(img, 1, 3)
         img = torch.transpose(img, 1, 2)
 

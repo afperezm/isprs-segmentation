@@ -25,9 +25,6 @@ class FLAIRDataModule(pl.LightningDataModule):
         self.source_train_dataset = None
         self.source_valid_dataset = None
 
-        self.target_train_dataset = None
-        self.target_valid_dataset = None
-
         self.target_dataset = None
 
     def setup(self, stage=None):
@@ -47,18 +44,11 @@ class FLAIRDataModule(pl.LightningDataModule):
                                                                                 [source_train_size, source_valid_size],
                                                                                 generator=self.generator)
 
-            target_dataset = FLAIRDataset(self.data_dir,
-                                          os.path.join(self.data_dir, 'sub_test_imgs.txt'),
-                                          os.path.join(self.data_dir, 'sub_test_masks.txt'),
-                                          bands='rgb',
-                                          transform=transform)
-
-            target_valid_size = 4
-            target_train_size = len(target_dataset) - target_valid_size
-
-            self.target_train_dataset, self.target_valid_dataset = random_split(target_dataset,
-                                                                                [target_train_size, target_valid_size],
-                                                                                generator=self.generator)
+            self.target_dataset = FLAIRDataset(self.data_dir,
+                                               os.path.join(self.data_dir, 'sub_test_imgs.txt'),
+                                               os.path.join(self.data_dir, 'sub_test_masks.txt'),
+                                               bands='rgb',
+                                               transform=transform)
         elif stage == 'predict':
             self.target_dataset = FLAIRDataset(self.data_dir,
                                                os.path.join(self.data_dir, 'sub_test_imgs.txt'),
@@ -70,7 +60,7 @@ class FLAIRDataModule(pl.LightningDataModule):
         return {
             'source': DataLoader(self.source_train_dataset, batch_size=self.batch_size,
                                  num_workers=self.num_workers // 2, shuffle=True, generator=self.generator),
-            'target': DataLoader(self.target_train_dataset, batch_size=self.batch_size,
+            'target': DataLoader(self.target_dataset, batch_size=self.batch_size,
                                  num_workers=self.num_workers // 2, shuffle=True, generator=self.generator)
         }
 

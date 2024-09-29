@@ -63,7 +63,7 @@ class ColorMapGAN(pl.LightningModule):
         pred_fake_source_images = self.discriminator(target_images_adapted)
 
         # real_loss = self.mse_loss(pred_real_source_images, torch.ones_like(pred_real_source_images))
-        fake_loss = self.mse_loss(pred_fake_source_images, torch.zeros_like(pred_fake_source_images))
+        # fake_loss = self.mse_loss(pred_fake_source_images, torch.zeros_like(pred_fake_source_images))
 
         # d_loss = 0.5 * (real_loss + fake_loss)
 

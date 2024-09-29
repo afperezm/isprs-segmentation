@@ -75,7 +75,7 @@ class FLAIRDataModule(pl.LightningDataModule):
         }
 
     def val_dataloader(self):
-        return DataLoader(self.target_valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers // 2,
+        return DataLoader(self.source_valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers // 2,
                           shuffle=False, generator=self.generator)
 
     def predict_dataloader(self):

@@ -8,6 +8,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+from codebase.datamodules.unpaired import FLAIRDataModule
 from codebase.datasets import ISPRSDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.datasets.unpaired import UnpairedDataset
@@ -46,6 +47,12 @@ def main():
             include_names=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
         )
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=1,
+            shuffle=False,
+            num_workers=8
+        )
     elif dataset_name == "isprs":
         train_dataset = ISPRSDataset(
             data_dir=data_dir[0],
@@ -56,6 +63,12 @@ def main():
                 transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
             ])
         )
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=1,
+            shuffle=False,
+            num_workers=8
+        )
     elif dataset_name == "flair":
         val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         train_dataset = FLAIRDataset(data_dir[0],
@@ -63,15 +76,18 @@ def main():
                                      os.path.join(data_dir[0], 'sub_test_masks.txt'),
                                      bands='rgb',
                                      transform=val_trans)
+        train_dataloader = DataLoader(
+            train_dataset,
+            batch_size=1,
+            shuffle=False,
+            num_workers=8
+        )
+    elif dataset_name == "unpaired-flair":
+        data_module = FLAIRDataModule(data_dir[0], batch_size=1, num_workers=8)
+        data_module.setup(stage='predict')
+        train_dataloader = data_module.predict_dataloader()
     else:
         raise ValueError("Invalid dataset selection")
-
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=1,
-        shuffle=False,
-        num_workers=8
-    )
 
     if model_name == "cyclegan":
         model = CycleGAN.load_from_checkpoint(ckpt_path)
@@ -131,7 +147,7 @@ def parse_args():
     parser.add_argument("--output_dir", help="Output directory")
     parser.add_argument("--ckpt_path", help="Checkpoint path", required=True)
     parser.add_argument("--dataset", help="Dataset name", dest="dataset_name",
-                        choices=["unpaired", "isprs", "flair"], required=True)
+                        choices=["unpaired", "isprs", "flair", "unpaired-flair"], required=True)
     parser.add_argument("--model", help="Model name", dest="model_name",
                         choices=["cyclegan", "colormapgan", "deeplabv3", "deeplabv3-resnet101"], required=True)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")

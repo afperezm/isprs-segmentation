@@ -84,7 +84,9 @@ def main():
             num_workers=8
         )
     elif dataset_name == "unpaired-flair":
-        data_module = FLAIRDataModule(data_dir[0], batch_size=1, include_names=True, num_workers=8)
+        predict_stage = 'train' if is_train else 'test'
+        data_module = FLAIRDataModule(data_dir[0], batch_size=1, predict_stage=predict_stage, include_names=True,
+                                      num_workers=8)
         data_module.setup(stage='predict')
         test_dataloader = data_module.predict_dataloader()
     else:
@@ -139,7 +141,7 @@ def main():
             print(image.shape, np.min(image), np.max(image))
 
             if os.path.splitext(image_name)[1] in ('.tif', '.tiff'):
-                tiff.imwrite(os.path.join(output_dir, exp_name, image_name), image)
+                tiff.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
             elif os.path.splitext(image_name)[1] in ('.png', '.jpg', '.jpeg'):
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
                 _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)

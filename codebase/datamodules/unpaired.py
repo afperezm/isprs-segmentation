@@ -33,8 +33,7 @@ class FLAIRDataModule(pl.LightningDataModule):
                                                  std=[0.5, 0.5, 0.5])
         if stage in ('fit', 'validate'):
             source_dataset = FLAIRDataset(self.data_dir,
-                                          os.path.join(self.data_dir, 'sub_train_imgs.txt'),
-                                          os.path.join(self.data_dir, 'sub_train_masks.txt'),
+                                          stage='train',
                                           bands='rgb',
                                           transform=transform)
 
@@ -46,14 +45,12 @@ class FLAIRDataModule(pl.LightningDataModule):
                                                                                 generator=self.generator)
 
             self.target_dataset = FLAIRDataset(self.data_dir,
-                                               os.path.join(self.data_dir, 'sub_test_imgs.txt'),
-                                               os.path.join(self.data_dir, 'sub_test_masks.txt'),
+                                               stage='test',
                                                bands='rgb',
                                                transform=transform)
         elif stage in ('test', 'predict'):
             self.source_dataset = FLAIRDataset(self.data_dir,
-                                               os.path.join(self.data_dir, 'sub_train_imgs.txt'),
-                                               os.path.join(self.data_dir, 'sub_train_masks.txt'),
+                                               stage='train',
                                                bands='rgb',
                                                transform=transform)
 

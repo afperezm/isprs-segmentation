@@ -33,8 +33,6 @@ class FLAIRDataset(Dataset):
     def __init__(
             self,
             data_dir,
-            images_txt,
-            masks_txt,
             bands='rgbirh',
             transform=None,
             crop_size=None,
@@ -43,14 +41,6 @@ class FLAIRDataset(Dataset):
             include_names=False
     ):
 
-        with open(images_txt) as f:
-            lines = f.readlines()
-        self.images_fps = sorted([line.strip() for line in lines])
-
-        with open(masks_txt) as f:
-            lines = f.readlines()
-        self.masks_fps = sorted([line.strip() for line in lines])
-
         self.data_dir = data_dir
         self.bands = bands
         self.transform = transform
@@ -58,6 +48,18 @@ class FLAIRDataset(Dataset):
         self.geo_info = geo_info
         self.stage = stage
         self.include_names = include_names
+
+        images_txt = os.path.join(self.data_dir, f'sub_{self.stage}_imgs.txt')
+
+        with open(images_txt) as f:
+            lines = f.readlines()
+        self.images_fps = sorted([line.strip() for line in lines])
+
+        masks_txt = os.path.join(self.data_dir, f'sub_{self.stage}_masks.txt')
+
+        with open(masks_txt) as f:
+            lines = f.readlines()
+        self.masks_fps = sorted([line.strip() for line in lines])
 
     def load_bands(self, img):
         if self.bands == 'rgbirh':
@@ -163,10 +165,8 @@ class FLAIRDataset(Dataset):
 if __name__ == "__main__":
 
     root_dir = sys.argv[1]
-    source_images_txt = sys.argv[2]
-    source_masks_txt = sys.argv[3]
 
-    dataset = FLAIRDataset(root_dir, source_images_txt, source_masks_txt, bands='rgb', crop_size=256)
+    dataset = FLAIRDataset(root_dir, stage='train', bands='rgb', crop_size=256)
 
     dataloader = DataLoader(dataset, batch_size=4, shuffle=False, num_workers=4)
 

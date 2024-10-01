@@ -72,8 +72,8 @@ def main():
     elif dataset_name == "flair":
         val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         train_dataset = FLAIRDataset(data_dir[0],
-                                     os.path.join(data_dir[0], 'sub_test_imgs.txt'),
-                                     os.path.join(data_dir[0], 'sub_test_masks.txt'),
+                                     stage='test',
+                                     include_names=True,
                                      bands='rgb',
                                      transform=val_trans)
         train_dataloader = DataLoader(

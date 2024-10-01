@@ -117,8 +117,7 @@ def main():
                                       generator=generator)
     elif dataset_name == "flair":
         train_dataset = FLAIRDataset(data_dir[0],
-                                     os.path.join(data_dir[0], 'sub_train_imgs.txt'),
-                                     os.path.join(data_dir[0], 'sub_train_masks.txt'),
+                                     stage='train',
                                      bands='rgb')
         # Split training dataset
         train_size = 1.0 - valid_size

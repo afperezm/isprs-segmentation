@@ -4,6 +4,7 @@ import os
 import cv2
 import numpy as np
 import pytorch_lightning as pl
+import tifffile as tiff
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -134,11 +135,14 @@ def main():
 
             image = np.transpose(image.cpu().detach().numpy().squeeze(), (1, 2, 0))
             image = (255 * image).astype(np.uint8)
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             print(image.shape, np.min(image), np.max(image))
 
-            _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
+            if os.path.splitext(image_name)[1] in ('.tif', '.tiff'):
+                tiff.imwrite(os.path.join(output_dir, exp_name, image_name), image)
+            elif os.path.splitext(image_name)[1] in ('.png', '.jpg', '.jpeg'):
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                _ = cv2.imwrite(os.path.join(output_dir, exp_name, split_name, "images", image_name), image)
 
 
 def parse_args():

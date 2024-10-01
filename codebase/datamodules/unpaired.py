@@ -49,7 +49,7 @@ class FLAIRDataModule(pl.LightningDataModule):
                                                os.path.join(self.data_dir, 'sub_test_masks.txt'),
                                                bands='rgb',
                                                transform=transform)
-        elif stage == 'predict':
+        elif stage in ('test', 'predict'):
             self.target_dataset = FLAIRDataset(self.data_dir,
                                                os.path.join(self.data_dir, 'sub_test_imgs.txt'),
                                                os.path.join(self.data_dir, 'sub_test_masks.txt'),

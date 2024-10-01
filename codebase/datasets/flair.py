@@ -39,7 +39,8 @@ class FLAIRDataset(Dataset):
             transform=None,
             crop_size=None,
             geo_info=None,
-            stage='train'
+            stage='train',
+            include_names=False
     ):
 
         with open(images_txt) as f:
@@ -56,6 +57,7 @@ class FLAIRDataset(Dataset):
         self.crop_size = crop_size
         self.geo_info = geo_info
         self.stage = stage
+        self.include_names = include_names
 
     def load_bands(self, img):
         if self.bands == 'rgbirh':
@@ -149,7 +151,10 @@ class FLAIRDataset(Dataset):
 
         # return self.images_fps[i], image, mask
 
-        return image, mask
+        if self.include_names:
+            return image, mask, os.path.basename(self.images_fps[i]), os.path.basename(self.masks_fps[i])
+        else:
+            return image, mask
 
     def __len__(self):
         return len(self.images_fps)

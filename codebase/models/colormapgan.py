@@ -94,7 +94,7 @@ class ColorMapGAN(pl.LightningModule):
         source_images_adapted = (source_images_adapted + 1.0) / 2.0
 
         if len(batch) == 4:
-            return source_images_adapted, batch[3]
+            return source_images_adapted, batch[2]
         else:
             return source_images_adapted
 

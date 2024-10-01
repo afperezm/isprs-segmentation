@@ -25,6 +25,7 @@ class FLAIRDataModule(pl.LightningDataModule):
         self.source_train_dataset = None
         self.source_valid_dataset = None
 
+        self.source_dataset = None
         self.target_dataset = None
 
     def setup(self, stage=None):
@@ -50,9 +51,9 @@ class FLAIRDataModule(pl.LightningDataModule):
                                                bands='rgb',
                                                transform=transform)
         elif stage in ('test', 'predict'):
-            self.target_dataset = FLAIRDataset(self.data_dir,
-                                               os.path.join(self.data_dir, 'sub_test_imgs.txt'),
-                                               os.path.join(self.data_dir, 'sub_test_masks.txt'),
+            self.source_dataset = FLAIRDataset(self.data_dir,
+                                               os.path.join(self.data_dir, 'sub_train_imgs.txt'),
+                                               os.path.join(self.data_dir, 'sub_train_masks.txt'),
                                                bands='rgb',
                                                transform=transform)
 
@@ -69,7 +70,7 @@ class FLAIRDataModule(pl.LightningDataModule):
                           shuffle=False, generator=self.generator)
 
     def predict_dataloader(self):
-        return DataLoader(self.source_valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
+        return DataLoader(self.source_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
                           shuffle=False, generator=self.generator)
 
 

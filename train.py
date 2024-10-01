@@ -54,16 +54,16 @@ def main():
         train_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
-            is_train=True
+            is_train=True,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
+            ])
         )
         # Split training dataset
         train_size = 1.0 - valid_size
         train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
-        # Assign training transform
-        train_dataset.dataset.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
-        ])
+
         valid_batch_size = 4 if batch_size == 1 else batch_size
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
                                       generator=generator)
@@ -73,16 +73,16 @@ def main():
         train_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
-            is_train=True
+            is_train=True,
+            transform=transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
+            ])
         )
         # Split training dataset
         train_size = 1.0 - valid_size
         train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
-        # Assign training transform
-        train_dataset.dataset.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize([0.0, 0.0, 0.0], [1.0, 1.0, 1.0])
-        ])
+
         valid_batch_size = 4 if batch_size == 1 else batch_size
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
                                       generator=generator)

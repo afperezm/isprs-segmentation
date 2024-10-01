@@ -40,21 +40,21 @@ def main():
         os.makedirs(os.path.join(output_dir, exp_name, "test", "images"), exist_ok=True)
 
     if dataset_name == "unpaired":
-        train_dataset = UnpairedDataset(
+        test_dataset = UnpairedDataset(
             source_dir=data_dir[0],
             target_dir=data_dir[1],
             is_train=is_train,
             include_names=True,
             transform=transforms.Compose([transforms.ToTensor(), transforms.Normalize([.5, .5, .5], [.5, .5, .5])])
         )
-        train_dataloader = DataLoader(
-            train_dataset,
+        test_dataloader = DataLoader(
+            test_dataset,
             batch_size=1,
             shuffle=False,
             num_workers=8
         )
     elif dataset_name == "isprs":
-        train_dataset = ISPRSDataset(
+        test_dataset = ISPRSDataset(
             data_dir=data_dir[0],
             is_train=is_train,
             include_names=True,
@@ -63,21 +63,21 @@ def main():
                 transforms.Normalize([0.485, 0.456, 0.406, 0, 0, 0], [0.229, 0.224, 0.225, 1, 1, 1])
             ])
         )
-        train_dataloader = DataLoader(
-            train_dataset,
+        test_dataloader = DataLoader(
+            test_dataset,
             batch_size=1,
             shuffle=False,
             num_workers=8
         )
     elif dataset_name == "flair":
-        val_trans = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        train_dataset = FLAIRDataset(data_dir[0],
-                                     stage='test',
-                                     include_names=True,
-                                     bands='rgb',
-                                     transform=val_trans)
-        train_dataloader = DataLoader(
-            train_dataset,
+        test_transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        test_dataset = FLAIRDataset(data_dir[0],
+                                    stage='test',
+                                    include_names=True,
+                                    bands='rgb',
+                                    transform=test_transform)
+        test_dataloader = DataLoader(
+            test_dataset,
             batch_size=1,
             shuffle=False,
             num_workers=8
@@ -85,7 +85,7 @@ def main():
     elif dataset_name == "unpaired-flair":
         data_module = FLAIRDataModule(data_dir[0], batch_size=1, num_workers=8)
         data_module.setup(stage='predict')
-        train_dataloader = data_module.predict_dataloader()
+        test_dataloader = data_module.predict_dataloader()
     else:
         raise ValueError("Invalid dataset selection")
 
@@ -94,14 +94,14 @@ def main():
     elif model_name == "colormapgan":
         model = ColorMapGAN.load_from_checkpoint(ckpt_path)
     elif model_name == "deeplabv3":
-        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.num_classes,
-                                               ignore_index=train_dataset.ignore_index,
-                                               labels_palette=train_dataset.labels_palette)
+        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
+                                               ignore_index=test_dataset.ignore_index,
+                                               labels_palette=test_dataset.labels_palette)
     elif model_name == "deeplabv3-resnet101":
         backbone = "resnet50" if len(model_name.split('-')) == 1 else "resnet101"
-        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=train_dataset.num_classes,
-                                               ignore_index=train_dataset.ignore_index,
-                                               labels_palette=train_dataset.labels_palette, backbone=backbone)
+        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
+                                               ignore_index=test_dataset.ignore_index,
+                                               labels_palette=test_dataset.labels_palette, backbone=backbone)
     else:
         raise ValueError("Invalid model selection")
 
@@ -111,14 +111,14 @@ def main():
 
     if not predict_only:
         # Perform evaluation
-        results = trainer.test(model=model, dataloaders=[train_dataloader])
+        results = trainer.test(model=model, dataloaders=[test_dataloader])
 
         # Print evaluation results
         print(results)
 
     if not test_only:
         # Perform prediction
-        results = trainer.predict(model=model, dataloaders=[train_dataloader])
+        results = trainer.predict(model=model, dataloaders=[test_dataloader])
 
         # Save predictions
         if is_train:

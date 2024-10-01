@@ -83,7 +83,7 @@ def main():
             num_workers=8
         )
     elif dataset_name == "unpaired-flair":
-        data_module = FLAIRDataModule(data_dir[0], batch_size=1, num_workers=8)
+        data_module = FLAIRDataModule(data_dir[0], batch_size=1, include_names=True, num_workers=8)
         data_module.setup(stage='predict')
         test_dataloader = data_module.predict_dataloader()
     else:

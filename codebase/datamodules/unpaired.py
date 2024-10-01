@@ -11,10 +11,11 @@ from codebase.utils.augmentation import get_validation_augmentations
 
 
 class FLAIRDataModule(pl.LightningDataModule):
-    def __init__(self, data_dir, batch_size=4, num_workers=1, generator=None):
+    def __init__(self, data_dir, batch_size=4, include_names=True, num_workers=1, generator=None):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
+        self.include_names = include_names
         self.num_workers = num_workers
 
         if generator:
@@ -34,6 +35,7 @@ class FLAIRDataModule(pl.LightningDataModule):
         if stage in ('fit', 'validate'):
             source_dataset = FLAIRDataset(self.data_dir,
                                           stage='train',
+                                          include_names=self.include_names,
                                           bands='rgb',
                                           transform=transform)
 
@@ -46,11 +48,13 @@ class FLAIRDataModule(pl.LightningDataModule):
 
             self.target_dataset = FLAIRDataset(self.data_dir,
                                                stage='test',
+                                               include_names=self.include_names,
                                                bands='rgb',
                                                transform=transform)
         elif stage in ('test', 'predict'):
             self.source_dataset = FLAIRDataset(self.data_dir,
                                                stage='train',
+                                               include_names=self.include_names,
                                                bands='rgb',
                                                transform=transform)
 

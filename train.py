@@ -4,7 +4,7 @@ import pytorch_lightning as pl
 import torch
 from torchvision import transforms
 
-from codebase.datamodules.unpaired import FLAIRDataModule
+from codebase.datamodules.unpaired import UnpairedDataModule
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
@@ -135,7 +135,7 @@ def main():
         valid_dataloader = DataLoader(valid_dataset, batch_size=valid_batch_size, shuffle=False, num_workers=8,
                                       generator=generator)
     elif dataset_name == "unpaired-flair":
-        data_module = FLAIRDataModule(data_dir[0], batch_size=batch_size, num_workers=8, generator=generator)
+        data_module = UnpairedDataModule(data_dir[0], batch_size=batch_size, num_workers=8, generator=generator)
         data_module.setup(stage='fit')
         train_dataloader = data_module.train_dataloader()
         valid_dataloader = data_module.val_dataloader()

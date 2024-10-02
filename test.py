@@ -9,7 +9,7 @@ import tifffile as tiff
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from codebase.datamodules.unpaired import FLAIRDataModule
+from codebase.datamodules.unpaired import UnpairedDataModule
 from codebase.datasets import ISPRSDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.datasets.unpaired import UnpairedDataset
@@ -85,8 +85,8 @@ def main():
         )
     elif dataset_name == "unpaired-flair":
         predict_stage = 'train' if is_train else 'test'
-        data_module = FLAIRDataModule(data_dir[0], batch_size=1, predict_stage=predict_stage, include_names=True,
-                                      num_workers=8)
+        data_module = UnpairedDataModule(data_dir[0], batch_size=1, predict_stage=predict_stage, include_names=True,
+                                         num_workers=8)
         data_module.setup(stage='predict')
         test_dataloader = data_module.predict_dataloader()
     else:

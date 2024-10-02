@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, random_split
 from codebase.utils.augmentation import get_validation_augmentations
 
 
-class FLAIRDataModule(pl.LightningDataModule):
+class UnpairedDataModule(pl.LightningDataModule):
     def __init__(self, data_dir, batch_size=4, predict_stage='train', include_names=True, num_workers=1, generator=None):
         super().__init__()
         self.data_dir = data_dir
@@ -79,7 +79,7 @@ class FLAIRDataModule(pl.LightningDataModule):
 if __name__ == "__main__":
     root_dir = sys.argv[1]
 
-    data_module = FLAIRDataModule(root_dir, batch_size=32, num_workers=8)
+    data_module = UnpairedDataModule(root_dir, batch_size=32, num_workers=8)
 
     data_module.setup(stage='fit')
 

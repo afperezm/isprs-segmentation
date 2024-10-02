@@ -74,6 +74,18 @@ python -u test.py --data_dir $HOME/data/potsdam-irrg-dataset-256-128/ $HOME/data
 python -u test.py --data_dir $HOME/data/vaihingen-irrg-dataset-256-128/ $HOME/data/potsdam-irrg-dataset/ --output_dir ./submits/ --model colormapgan --dataset unpaired --ckpt_path ./results/colormapgan/colormapgan-240505-043836/checkpoints/epoch=4-step=158660.ckpt --enable_progress_bar --predict_only
 ```
 
+## Finetune segmentation models
+
+Finetune DeepLabV3 pre-trained on Potsdam RGB
+
+```bash
+python -u train.py --data_dir ./submits/cyclegan-240501-033914/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.00002 0.00002 --model deeplabv3 --dataset isprs --ckpt_path ./results/segmentation/deeplabv3-240515-224010/checkpoints/epoch=48-step=74431.ckpt --comment "Finetune DeepLabV3 segmentation model with ResNet-50 backbone on Potsdam RGB adapted to Vaihingen IRRG using CycleGAN (images of size 256x256 cropped with a stride of 128)"
+python -u train.py --data_dir ./submits/colormapgan-240505-043720/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.00002 0.00002 --model deeplabv3 --dataset isprs --ckpt_path ./results/segmentation/deeplabv3-240515-224010/checkpoints/epoch=48-step=74431.ckpt --comment "Finetune DeepLabV3 segmentation model with ResNet-50 backbone on Potsdam RGB adapted to Vaihingen IRRG using ColorMapGAN (images of size 256x256 cropped with a stride of 128)"
+python -u train.py --data_dir $HOME/data/potsdam-irrg-dataset-256-128/ --results_dir ./results/segmentation/ --epochs 50 --batch_size 32 --learning_rate 0.00002 0.00002 --model deeplabv3 --dataset isprs --ckpt_path ./results/segmentation/deeplabv3-240515-224010/checkpoints/epoch=48-step=74431.ckpt --comment "Finetune DeepLabV3 segmentation model with ResNet-50 backbone on Potsdam IRRG (images of size 256x256 cropped with a stride of 128)"
+```
+
+Finetune DeepLabV3 pre-trained on Vaihingen IRRG
+
 ## FLAIR experiments
 
 ```bash

@@ -8,7 +8,7 @@ from codebase.datamodules.unpaired import FLAIRDataModule
 from codebase.datasets import ISPRSDataset, UnpairedDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.models import ColorMapGAN, CycleGAN, DeepLabV3
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor, EarlyStopping
 from pytorch_lightning.loggers import TensorBoardLogger, WandbLogger
 from time import strftime
 from torch.utils.data import DataLoader, random_split
@@ -155,6 +155,7 @@ def main():
         checkpointing = ModelCheckpoint(monitor="valid/loss", save_last=True, save_top_k=5, mode="min")
     else:
         raise ValueError("Invalid model selection")
+    early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=6, mode="min")
 
     # Dump program arguments
     tb_logger.log_hyperparams(params=PARAMS)
@@ -194,7 +195,7 @@ def main():
     # Initialize trainer
     trainer = pl.Trainer(
         logger=[tb_logger, wb_logger],
-        callbacks=[lr_monitor, checkpointing],
+        callbacks=[lr_monitor, checkpointing, early_stopping],
         accelerator="auto",
         devices=1,
         max_epochs=epochs,

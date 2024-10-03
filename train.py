@@ -156,7 +156,7 @@ def main():
         checkpointing = ModelCheckpoint(monitor="valid/loss", save_last=True, save_top_k=5, mode="min")
     else:
         raise ValueError("Invalid model selection")
-    early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=6, mode="min")
+    early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=30, mode="min")
 
     # Dump program arguments
     tb_logger.log_hyperparams(params=PARAMS)

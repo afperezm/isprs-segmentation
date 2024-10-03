@@ -169,8 +169,12 @@ class DeepLabV3(pl.LightningModule):
 
         optimizer = optim.Adam(grouped_parameters, lr=backbone_learning_rate, weight_decay=backbone_weight_decay)
 
+        # optimizer = optim.AdamW(grouped_parameters, lr=backbone_learning_rate, weight_decay=backbone_weight_decay)
+
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor,
                                                          patience=scheduler_patience,
                                                          threshold=scheduler_threshold)
+
+        # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=120, gamma=0.75)
 
         return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "monitor": "valid/loss"}}

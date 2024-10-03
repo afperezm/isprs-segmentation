@@ -124,12 +124,12 @@ def main():
         train_size = 1.0 - valid_size
         train_dataset, valid_dataset = random_split(train_dataset, [train_size, valid_size], generator=generator)
         # Assign training transform
-        train_dataset.dataset.transform = choose_training_augmentations(mean=[0.485, 0.456, 0.406],
-                                                                        std=[0.229, 0.224, 0.225],
+        train_dataset.dataset.transform = choose_training_augmentations(mean=[0.44609856, 0.46605311, 0.43317396],
+                                                                        std=[0.21038504, 0.18305449, 0.17746451],
                                                                         aug_type='randaugment')
         # Assign validation transform
-        valid_dataset.dataset.transform = get_validation_augmentations(mean=[0.485, 0.456, 0.406],
-                                                                       std=[0.229, 0.224, 0.225])
+        valid_dataset.dataset.transform = get_validation_augmentations(mean=[0.44609856, 0.46605311, 0.43317396],
+                                                                       std=[0.21038504, 0.18305449, 0.17746451])
         valid_batch_size = batch_size
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=8,
                                       generator=generator)

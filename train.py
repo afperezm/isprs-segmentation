@@ -117,7 +117,6 @@ def main():
                                       generator=generator)
     elif dataset_name == "flair":
         train_dataset = FLAIRDataset(data_dir[0],
-                                     crop_size=256,
                                      stage='train',
                                      bands='rgb')
         # Split training dataset

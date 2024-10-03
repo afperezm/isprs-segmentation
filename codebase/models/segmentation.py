@@ -24,11 +24,11 @@ def make_decoded_grid(tensor, palette):
     return grid_tensor
 
 
-class DeepLabV3(pl.LightningModule):
+class Segmentation(pl.LightningModule):
     def __init__(self, num_classes, ignore_index, labels_palette, backbone='resnet50', loss_ce_weight=1.0, loss_dice_weight=0.0,
                  backbone_learning_rate=0.00005, classifier_learning_rate=0.00005,
                  backbone_weight_decay=0.0, classifier_weight_decay=0.0, **kwargs):
-        super(DeepLabV3, self).__init__()
+        super(Segmentation, self).__init__()
 
         self.save_hyperparameters(logger=False)
 

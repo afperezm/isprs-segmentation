@@ -13,7 +13,7 @@ from codebase.datamodules.unpaired import UnpairedDataModule
 from codebase.datasets import ISPRSDataset
 from codebase.datasets.flair import FLAIRDataset
 from codebase.datasets.unpaired import UnpairedDataset
-from codebase.models import ColorMapGAN, DeepLabV3
+from codebase.models import ColorMapGAN, Segmentation
 from codebase.models.cyclegan import CycleGAN
 from codebase.utils.augmentation import get_validation_augmentations
 
@@ -97,14 +97,14 @@ def main():
     elif model_name == "colormapgan":
         model = ColorMapGAN.load_from_checkpoint(ckpt_path)
     elif model_name == "deeplabv3":
-        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
-                                               ignore_index=test_dataset.ignore_index,
-                                               labels_palette=test_dataset.labels_palette)
+        model = Segmentation.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
+                                                  ignore_index=test_dataset.ignore_index,
+                                                  labels_palette=test_dataset.labels_palette)
     elif model_name == "deeplabv3-resnet101":
         backbone = "resnet50" if len(model_name.split('-')) == 1 else "resnet101"
-        model = DeepLabV3.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
-                                               ignore_index=test_dataset.ignore_index,
-                                               labels_palette=test_dataset.labels_palette, backbone=backbone)
+        model = Segmentation.load_from_checkpoint(ckpt_path, num_classes=test_dataset.num_classes,
+                                                  ignore_index=test_dataset.ignore_index,
+                                                  labels_palette=test_dataset.labels_palette, backbone=backbone)
     else:
         raise ValueError("Invalid model selection")
 

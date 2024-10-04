@@ -53,10 +53,10 @@ class Segmentation(pl.LightningModule):
 
         self.criterion = nn.CrossEntropyLoss(ignore_index=ignore_index)
         self.criterion2 = torchmetrics.Dice(num_classes=num_classes, ignore_index=ignore_index)
-        self.metric1 = JaccardIndex(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
-        self.metric2 = Precision(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
-        self.metric3 = Recall(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
-        self.metric4 = F1Score(task='multiclass', num_classes=num_classes, ignore_index=ignore_index)
+        self.metric1 = JaccardIndex(task='multiclass', num_classes=num_classes)
+        self.metric2 = Precision(task='multiclass', num_classes=num_classes)
+        self.metric3 = Recall(task='multiclass', num_classes=num_classes)
+        self.metric4 = F1Score(task='multiclass', num_classes=num_classes)
 
     def shared_step(self, batch):
         loss_ce_weight = self.hparams.loss_ce_weight

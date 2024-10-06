@@ -155,7 +155,12 @@ def main():
         checkpointing = ModelCheckpoint(monitor="valid/loss", save_last=True, save_top_k=5, mode="min")
     else:
         raise ValueError("Invalid model selection")
-    early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=30, mode="min")
+
+    callbacks = [lr_monitor, checkpointing]
+
+    if model_name == "deeplabv3" or model_name == "deeplabv3-resnet101":
+        early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=30, mode="min")
+        callbacks.append(early_stopping)
 
     # Dump program arguments
     tb_logger.log_hyperparams(params=PARAMS)
@@ -195,7 +200,7 @@ def main():
     # Initialize trainer
     trainer = pl.Trainer(
         logger=[tb_logger, wb_logger],
-        callbacks=[lr_monitor, checkpointing, early_stopping],
+        callbacks=callbacks,
         accelerator="auto",
         devices=1,
         max_epochs=epochs,

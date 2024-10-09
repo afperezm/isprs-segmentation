@@ -13,6 +13,9 @@ from torchvision.models.segmentation import DeepLabV3_ResNet50_Weights, DeepLabV
 
 def make_decoded_grid(tensor, palette):
 
+    if tensor.dim() == 3:
+        tensor = tensor.unsqueeze(1)
+
     grid = torchvision.utils.make_grid(tensor)[0]
 
     grid_image = Image.fromarray(grid.byte().cpu().numpy())
@@ -108,7 +111,6 @@ class Segmentation(pl.LightningModule):
             grid = torchvision.utils.make_grid(images, normalize=True, value_range=(-1, 1))
             tensorboard.add_image(tag="valid/images", img_tensor=grid, global_step=current_epoch)
 
-            masks = torch.unsqueeze(masks, 1)
             grid = make_decoded_grid(masks, self.labels_palette)
             tensorboard.add_image(tag="valid/masks", img_tensor=grid, global_step=current_epoch)
 

@@ -30,6 +30,8 @@ def main():
     scheduler_factor = PARAMS.scheduler_factor
     scheduler_patience = PARAMS.scheduler_patience
     scheduler_threshold = PARAMS.scheduler_threshold
+    min_delta = PARAMS.early_stopping_min_delta
+    patience = PARAMS.early_stopping_patience
     enable_progress_bar = PARAMS.enable_progress_bar
     seed = PARAMS.seed
     ckpt_path = PARAMS.ckpt_path
@@ -159,7 +161,7 @@ def main():
     callbacks = [lr_monitor, checkpointing]
 
     if model_name == "deeplabv3" or model_name == "deeplabv3-resnet101":
-        early_stopping = EarlyStopping(monitor="valid/loss", min_delta=0.0, patience=30, mode="min")
+        early_stopping = EarlyStopping(monitor="valid/loss", min_delta=min_delta, patience=patience, verbose=True)
         callbacks.append(early_stopping)
 
     # Dump program arguments
@@ -231,6 +233,8 @@ def parse_args():
     parser.add_argument("--scheduler_factor", help="LR Scheduler reduction factor", type=float, default=0.2)
     parser.add_argument("--scheduler_patience", help="Number of epochs with improvement", type=int, default=7)
     parser.add_argument("--scheduler_threshold", help="Threshold to measure improvement", type=float, default=0.0001)
+    parser.add_argument("--early_stopping_min_delta", help="Min early stopping difference", type=float, default=0.002)
+    parser.add_argument("--early_stopping_patience", help="Patience for early stopping", type=int, default=6)
     parser.add_argument("--enable_progress_bar", help="Flag to enable progress bar", action="store_true")
     parser.add_argument("--seed", help="Random numbers generator seed", type=int, default=42)
     parser.add_argument("--ckpt_path", help="Resume checkpoint path")
